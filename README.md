@@ -120,8 +120,5 @@ python textart.py image.jpg --cols 100 | less -R
 ## License
 MIT (add a `LICENSE` file to finalize).
 
-## Suggested Repository Name
-`BraillePixel` (alternatives: `braillify`, `braille-art-cli`, `uni-braille-render`).
-
 ---
 Feel free to open issues or extend the script.
