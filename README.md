@@ -1,5 +1,10 @@
 # BraillePixel
 
+<!-- Badges -->
+<!-- Uncomment / replace after publishing to PyPI or adding CI -->
+<!-- ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) -->
+<!-- ![Python Versions](https://img.shields.io/badge/python-3.9+-blue.svg) -->
+
 Lightweight CLI tool to render images as Unicode Braille art directly in your terminal.
 
 ## Repository
@@ -15,6 +20,10 @@ pip install -r requirements.txt
 python textart.py sample.jpg --cols 80
 ```
 
+## Requirements
+- Python 3.9+ (tested on 3.13)
+- Pillow
+
 ## Why Braille?
 Unicode Braille patterns (U+2800–U+28FF) pack an 2x4 pixel matrix into a single character, giving higher vertical resolution than standard ASCII art. This lets you represent more detail with fewer rows.
 
@@ -25,6 +34,7 @@ Unicode Braille patterns (U+2800–U+28FF) pack an 2x4 pixel matrix into a singl
 - Aspect-ratio preserving scaling
 - Adjustable brightness threshold
 - Safe resizing (never produces degenerate tiny output)
+- Zero external font dependencies (just a Unicode-capable terminal)
 
 ## Quick Start
 ```bash
@@ -73,6 +83,16 @@ python textart.py face.jpg --cols 70 --threshold 150
 python textart.py face.jpg --cols 70 --threshold 90
 ```
 
+## Sample Output
+```
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⢠⣶⣄⠀⠀⣴⣦⠀⠀⠀
+⠀⢀⣿⣿⣿⡆⢸⣿⣿⣿⡇⠀
+⠀⠈⣿⣿⣿⠇⢸⣿⣿⣿⡇⠀
+⠀⠀⠈⠛⠋⠀⠀⠈⠛⠋⠀⠀
+```
+(Result using a simplified demo image at 18 cols.)
+
 ## How It Works
 1. Image is converted to 8-bit grayscale.
 2. Optionally rescaled to target Braille cell dimensions.
@@ -95,12 +115,18 @@ python textart.py image.jpg --cols 100 | less -R
 ```
 `-R` preserves Unicode without escaping.
 
+## Performance Notes
+- Scaling uses Pillow's bicubic filter (fast & smooth for small terminal previews).
+- Each Braille char replaces 8 pixels (2x4), reducing data volume sharply.
+- Typical 80x40 cell output processes in milliseconds on modern hardware.
+
 ## Roadmap / Ideas
 - Invert mode
 - Auto threshold via Otsu method
 - Color approximation (ANSI) pre-pass
 - Export to text file (`--out`)
 - GIF frame animation
+- Optional dithering (Floyd–Steinberg) before threshold
 
 ## Troubleshooting
 | Issue | Fix |
@@ -109,16 +135,17 @@ python textart.py image.jpg --cols 100 | less -R
 | Output too tall | Use `--rows` or reduce `--cols` |
 | Too dark / light | Adjust `--threshold` |
 | Distorted aspect | Only specify one of `--cols` or `--rows` |
+| Unicode blocks show as blanks | Use a font with Braille range support |
 
 ## Contributing
 1. Fork the repo
 2. Create a feature branch: `git checkout -b feat/my-change`
-3. Install dev deps (currently only Pillow)
-4. Run / test your changes
-5. Submit PR with description & before/after sample output
+3. Install deps: `pip install -r requirements.txt`
+4. Add a before/after snippet if visual change
+5. Open PR
 
 ## License
-MIT (add a `LICENSE` file to finalize).
+MIT
 
 ---
 Feel free to open issues or extend the script.
