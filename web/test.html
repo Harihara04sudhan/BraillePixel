@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BraillePixel API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .result { background: #f5f5f5; padding: 10px; white-space: pre-wrap; font-family: monospace; }
+        .error { color: red; }
+        .success { color: green; }
+        button { padding: 10px 15px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 BraillePixel API Test</h1>
+    
+    <div class="test-section">
+        <h2>Environment Detection</h2>
+        <div id="env-info"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>API Tests</h2>
+        <button onclick="testBrailleAPI()">Test Braille API</button>
+        <button onclick="testEmojiAPI()">Test Emoji API</button>
+        <button onclick="testASCIIAPI()">Test ASCII API</button>
+        <div id="test-results"></div>
+    </div>
+    
+    <script>
+        // Copy the API endpoint function from main script
+        function getApiEndpoint(endpoint) {
+            const hostname = window.location.hostname;
+            const isProduction = hostname.includes('netlify.app') || hostname.includes('netlify.com');
+            
+            console.log('Hostname:', hostname, 'Production:', isProduction);
+            
+            if (isProduction) {
+                return `/.netlify/functions/${endpoint}`;
+            } else {
+                return `/api/${endpoint}`;
+            }
+        }
+        
+        // Display environment info
+        function updateEnvInfo() {
+            const hostname = window.location.hostname;
+            const isProduction = hostname.includes('netlify.app') || hostname.includes('netlify.com');
+            
+            document.getElementById('env-info').innerHTML = `
+                <p><strong>Hostname:</strong> ${hostname}</p>
+                <p><strong>Port:</strong> ${window.location.port}</p>
+                <p><strong>Full URL:</strong> ${window.location.href}</p>
+                <p><strong>Is Production:</strong> ${isProduction}</p>
+                <p><strong>Braille API Endpoint:</strong> ${getApiEndpoint('braille')}</p>
+                <p><strong>Emoji API Endpoint:</strong> ${getApiEndpoint('emoji')}</p>
+                <p><strong>ASCII API Endpoint:</strong> ${getApiEndpoint('ascii')}</p>
+            `;
+        }
+        
+        function logResult(message, isError = false) {
+            const resultDiv = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = isError ? 'error' : 'success';
+            resultDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            resultDiv.scrollTop = resultDiv.scrollHeight;
+        }
+        
+        function testBrailleAPI() {
+            logResult('Testing Braille API...');
+            const endpoint = getApiEndpoint('braille');
+            
+            // Create a simple test image data (small 4x4 black square)
+            const canvas = document.createElement('canvas');
+            canvas.width = 20;
+            canvas.height = 20;
+            const ctx = canvas.getContext('2d');
+            
+            // White background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, 20, 20);
+            
+            // Black square in center
+            ctx.fillStyle = 'black';
+            ctx.fillRect(8, 8, 4, 4);
+            
+            const imageData = canvas.toDataURL('image/png');
+            
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image: imageData,
+                    cols: 10,
+                    threshold: 127
+                })
+            })
+            .then(response => {
+                logResult(`Braille API response status: ${response.status}`);
+                return response.text();
+            })
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.result) {
+                        logResult(`✅ Braille API SUCCESS! Generated ${data.result.length} characters`);
+                        logResult(`Result preview: ${data.result.split('\\n')[0]}...`);
+                    } else if (data.error) {
+                        logResult(`❌ Braille API returned error: ${data.error}`, true);
+                    }
+                } catch (e) {
+                    logResult(`❌ Braille API returned invalid JSON: ${text.substring(0, 100)}...`, true);
+                }
+            })
+            .catch(error => {
+                logResult(`❌ Braille API request failed: ${error}`, true);
+            });
+        }
+        
+        function testEmojiAPI() {
+            logResult('Testing Emoji API...');
+            const endpoint = getApiEndpoint('emoji');
+            
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    mode: 'text',
+                    text: 'HI',
+                    on_emoji: '🔥',
+                    width: 20
+                })
+            })
+            .then(response => {
+                logResult(`Emoji API response status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.result) {
+                    logResult(`✅ Emoji API SUCCESS! Generated ${data.result.length} characters`);
+                } else if (data.error) {
+                    logResult(`❌ Emoji API error: ${data.error}`, true);
+                }
+            })
+            .catch(error => {
+                logResult(`❌ Emoji API failed: ${error}`, true);
+            });
+        }
+        
+        function testASCIIAPI() {
+            logResult('Testing ASCII API...');
+            const endpoint = getApiEndpoint('ascii');
+            
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: 'TEST',
+                    font: 'block'
+                })
+            })
+            .then(response => {
+                logResult(`ASCII API response status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.result) {
+                    logResult(`✅ ASCII API SUCCESS! Generated ${data.result.length} characters`);
+                } else if (data.error) {
+                    logResult(`❌ ASCII API error: ${data.error}`, true);
+                }
+            })
+            .catch(error => {
+                logResult(`❌ ASCII API failed: ${error}`, true);
+            });
+        }
+        
+        // Initialize on page load
+        window.onload = function() {
+            updateEnvInfo();
+            logResult('Page loaded. Ready to test APIs.');
+        };
+    </script>
+</body>
+</html>

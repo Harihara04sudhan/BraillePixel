@@ -21,6 +21,35 @@ from ascii_text import text_to_ascii_art, create_border, create_gradient_text
 app = Flask(__name__)
 CORS(app)
 
+# Fallback routes for Netlify function paths (for local development)
+@app.route('/.netlify/functions/braille', methods=['POST', 'OPTIONS'])
+def netlify_braille_fallback():
+    """Redirect Netlify function calls to Flask API during local development"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    return generate_braille_api()
+
+@app.route('/.netlify/functions/emoji', methods=['POST', 'OPTIONS'])
+def netlify_emoji_fallback():
+    """Redirect Netlify function calls to Flask API during local development"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    return generate_emoji_api()
+
+@app.route('/.netlify/functions/ascii', methods=['POST', 'OPTIONS'])
+def netlify_ascii_fallback():
+    """Redirect Netlify function calls to Flask API during local development"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    return generate_ascii_api()
+
+@app.route('/.netlify/functions/emoji-sets', methods=['GET', 'OPTIONS'])
+def netlify_emoji_sets_fallback():
+    """Redirect Netlify function calls to Flask API during local development"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    return get_emoji_sets()
+
 @app.route('/')
 def index():
     return send_from_directory('web', 'index.html')

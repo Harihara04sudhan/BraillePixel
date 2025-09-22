@@ -1,3 +1,21 @@
+// API endpoint configuration
+function getApiEndpoint(endpoint) {
+    // For local development, we now have fallback routes that work with both paths
+    // So we can always use the /api/ paths, but keep Netlify detection for production
+    const hostname = window.location.hostname;
+    const isProduction = hostname.includes('netlify.app') || hostname.includes('netlify.com');
+    
+    console.log('Hostname:', hostname, 'Production:', isProduction);
+    
+    if (isProduction) {
+        // Production - use Netlify functions
+        return `/.netlify/functions/${endpoint}`;
+    } else {
+        // Local development - use Flask routes (fallback routes handle both paths)
+        return `/api/${endpoint}`;
+    }
+}
+
 // Tab functionality
 function showTab(tabName) {
     // Hide all tab contents
@@ -104,7 +122,7 @@ function generateBraille() {
         const imageData = e.target.result;
         
         // Call the backend API
-        fetch('/api/braille', {
+        fetch(getApiEndpoint('braille'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -194,7 +212,7 @@ function generateEmoji() {
             
             output.textContent = 'Generating emoji art...';
             
-            fetch('/api/emoji', {
+            fetch(getApiEndpoint('emoji'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -243,7 +261,7 @@ function generateEmoji() {
         
         output.textContent = 'Generating emoji art...';
         
-        fetch('/api/emoji', {
+        fetch(getApiEndpoint('emoji'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -347,7 +365,7 @@ function generateASCII() {
     
     output.textContent = 'Generating ASCII art...';
     
-    fetch('/api/ascii', {
+    fetch(getApiEndpoint('ascii'), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

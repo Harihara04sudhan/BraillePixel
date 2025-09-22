@@ -18,10 +18,33 @@ python demo.py  # See all formats in action
 ```
 
 ## 🌐 Web Interface
+
+### Local Development
 ```bash
 python web_server.py
 # Open http://localhost:5000 for interactive GUI
 ```
+
+### Deploy to Netlify
+This project is configured for easy deployment to Netlify with serverless functions:
+
+1. **Push to GitHub**: Make sure your code is in a GitHub repository
+2. **Connect to Netlify**: 
+   - Go to [netlify.com](https://netlify.com)
+   - Click "New site from Git"
+   - Choose your GitHub repository
+3. **Deploy Settings**: Netlify will auto-detect the configuration from `netlify.toml`
+   - Build command: `echo 'Building Python functions...'`
+   - Publish directory: `web`
+   - Functions directory: `netlify/functions`
+
+The deployment includes:
+- Static web interface served from `/web`
+- Python serverless functions for API endpoints
+- Automatic CORS handling
+- API routing (`/api/*` → `/.netlify/functions/*`)
+
+**Live Demo**: https://pictomoji.netlify.app/
 
 ## 📦 What's Included
 - **`textart.py`** - Image → Braille art (high resolution Unicode)
