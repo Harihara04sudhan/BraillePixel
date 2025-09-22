@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Braille Art Generation (Client-side simulation)
+// Braille Art Generation (Real API calls)
 function generateBraille() {
     const fileInput = document.getElementById('braille-file');
     const output = document.getElementById('output');
@@ -68,14 +68,46 @@ function generateBraille() {
     const cols = document.getElementById('braille-cols').value;
     const rows = document.getElementById('braille-rows').value;
     const threshold = document.getElementById('braille-threshold').value;
+    const invert = document.getElementById('braille-invert').checked;
     
     output.textContent = 'Processing image...';
     
-    // Simulate processing with demo output
-    setTimeout(() => {
-        const demoArt = generateDemoBrailleArt(parseInt(cols), parseInt(rows));
-        output.textContent = demoArt;
-    }, 1000);
+    // Read the file and convert to base64
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const imageData = e.target.result;
+        
+        // Call the backend API
+        fetch('/api/braille', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                image: imageData,
+                cols: parseInt(cols),
+                rows: parseInt(rows),
+                threshold: parseInt(threshold),
+                invert: invert
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                output.textContent = 'Error: ' + data.error;
+            } else {
+                output.textContent = data.result;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            output.textContent = 'Error processing image: ' + error.message;
+        });
+    };
+    
+    reader.readAsDataURL(file);
 }
 
 function generateDemoBrailleArt(cols, rows) {
@@ -96,7 +128,7 @@ function generateDemoBrailleArt(cols, rows) {
     return result;
 }
 
-// Emoji Art Generation (Client-side simulation)
+// Emoji Art Generation (Real API calls)
 function generateEmoji() {
     const mode = document.querySelector('input[name="emoji-mode"]:checked').value;
     const output = document.getElementById('output');
@@ -107,24 +139,85 @@ function generateEmoji() {
             output.textContent = 'Please select an image file first.';
             return;
         }
-    }
-    
-    const emojiSet = document.getElementById('emoji-set').value;
-    const customEmoji = document.getElementById('custom-emoji').value;
-    const width = document.getElementById('emoji-width').value;
-    const text = document.getElementById('emoji-text').value;
-    
-    output.textContent = 'Generating emoji art...';
-    
-    setTimeout(() => {
-        let demoArt;
-        if (mode === 'text') {
-            demoArt = generateDemoEmojiText(text, customEmoji, parseInt(width));
-        } else {
-            demoArt = generateDemoEmojiArt(emojiSet, customEmoji, parseInt(width));
+        
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const imageData = e.target.result;
+            const emojiSet = document.getElementById('emoji-set').value;
+            const customEmoji = document.getElementById('custom-emoji').value;
+            const width = document.getElementById('emoji-width').value;
+            
+            output.textContent = 'Generating emoji art...';
+            
+            fetch('/api/emoji', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    mode: 'image',
+                    image: imageData,
+                    width: parseInt(width),
+                    emoji_set: emojiSet,
+                    custom_emojis: customEmoji
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    output.textContent = 'Error: ' + data.error;
+                } else {
+                    output.textContent = data.result;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                output.textContent = 'Error processing image: ' + error.message;
+            });
+        };
+        
+        reader.readAsDataURL(file);
+        
+    } else {
+        // Text mode
+        const text = document.getElementById('emoji-text').value;
+        const customEmoji = document.getElementById('custom-emoji').value;
+        const width = document.getElementById('emoji-width').value;
+        
+        if (!text) {
+            output.textContent = 'Please enter text to convert.';
+            return;
         }
-        output.textContent = demoArt;
-    }, 800);
+        
+        output.textContent = 'Generating emoji art...';
+        
+        fetch('/api/emoji', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                mode: 'text',
+                text: text,
+                emoji: customEmoji || '🔥',
+                width: parseInt(width)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                output.textContent = 'Error: ' + data.error;
+            } else {
+                output.textContent = data.result;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            output.textContent = 'Error generating text: ' + error.message;
+        });
+    }
 }
 
 function generateDemoEmojiText(text, emoji, width) {
@@ -186,7 +279,7 @@ function generateDemoEmojiArt(emojiSet, customEmoji, width) {
     return result;
 }
 
-// ASCII Text Generation (Client-side)
+// ASCII Text Generation (Real API calls)
 function generateASCII() {
     const text = document.getElementById('ascii-text').value;
     const font = document.getElementById('ascii-font').value;
@@ -202,10 +295,31 @@ function generateASCII() {
     
     output.textContent = 'Generating ASCII art...';
     
-    setTimeout(() => {
-        const art = generateDemoASCIIArt(text.toUpperCase(), font, spacing, border, gradient);
-        output.textContent = art;
-    }, 500);
+    fetch('/api/ascii', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            text: text,
+            font: font,
+            spacing: spacing,
+            border: border,
+            gradient: gradient
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            output.textContent = 'Error: ' + data.error;
+        } else {
+            output.textContent = data.result;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        output.textContent = 'Error generating ASCII: ' + error.message;
+    });
 }
 
 function generateDemoASCIIArt(text, font, spacing, border, gradient) {

@@ -46,14 +46,18 @@ def generate_braille_api():
         cols = data.get('cols', 80)
         rows = data.get('rows', None)
         threshold = data.get('threshold', 127)
+        invert = data.get('invert', False)
+        
+        print(f"Debug - Web API: cols={cols}, threshold={threshold}, invert={invert}", file=sys.stderr)
         
         # Process image
         img = resize_to_cells(img, cols=cols, rows=rows)
-        result = image_to_braille(img, threshold=threshold)
+        result = image_to_braille(img, threshold=threshold, invert=invert)
         
         return jsonify({'result': result})
         
     except Exception as e:
+        print(f"Error in braille API: {e}", file=sys.stderr)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/emoji', methods=['POST'])
