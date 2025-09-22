@@ -5,147 +5,196 @@
 <!-- ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) -->
 <!-- ![Python Versions](https://img.shields.io/badge/python-3.9+-blue.svg) -->
 
-Lightweight CLI tool to render images as Unicode Braille art directly in your terminal.
+🎨 **Multi-format text art generator** - Convert images and text to Braille, Emoji, and ASCII art with CLI tools + web interface.
 
-## Repository
-GitHub: https://github.com/Harihara04sudhan/BraillePixel
-
-Clone:
+## 🚀 Quick Demo
 ```bash
 git clone https://github.com/Harihara04sudhan/BraillePixel.git
 cd BraillePixel
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python textart.py sample.jpg --cols 80
+python demo.py  # See all formats in action
 ```
 
-## Requirements
-- Python 3.9+ (tested on 3.13)
-- Pillow
-
-## Why Braille?
-Unicode Braille patterns (U+2800–U+28FF) pack an 2x4 pixel matrix into a single character, giving higher vertical resolution than standard ASCII art. This lets you represent more detail with fewer rows.
-
-## Features
-- Convert any image to Braille art
-- Automatic grayscale conversion
-- Dimension control by Braille cells (columns / rows)
-- Aspect-ratio preserving scaling
-- Adjustable brightness threshold
-- Safe resizing (never produces degenerate tiny output)
-- Zero external font dependencies (just a Unicode-capable terminal)
-
-## Quick Start
+## 🌐 Web Interface
 ```bash
+python web_server.py
+# Open http://localhost:5000 for interactive GUI
+```
+
+## 📦 What's Included
+- **`textart.py`** - Image → Braille art (high resolution Unicode)
+- **`emoji_art.py`** - Image/text → Emoji mosaics (6 themed sets + custom)
+- **`ascii_text.py`** - Text → Large ASCII art (multiple fonts + effects)
+- **Web UI** - Interactive browser interface for all tools
+
+## 🎯 Features
+- **Braille Art**: 2x4 pixel density, dimension control, threshold adjustment
+- **Emoji Art**: 6 emoji sets (faces, hearts, nature, etc.) + custom emojis
+- **ASCII Text**: Block/simple fonts, borders, gradients, spacing control
+- **Web Interface**: Drag-drop images, real-time preview, copy/download
+- **CLI Tools**: Scriptable with full parameter control
+
+## 💻 CLI Examples
+
+### Braille Art
+```bash
+python textart.py image.jpg --cols 80 --threshold 140
+python textart.py photo.png --rows 30 --cols 100
+```
+
+### Emoji Art
+```bash
+# Text to emoji
+python emoji_art.py "HELLO" --mode text --emoji "🔥" --width 40
+
+# Image to emoji mosaic
+python emoji_art.py photo.jpg --emoji-set hearts --width 60
+python emoji_art.py logo.png --custom-emojis "🌟,⭐,✨,💫"
+
+# List available sets
+python emoji_art.py --list-sets dummy
+```
+
+### ASCII Text Art
+```bash
+python ascii_text.py "BraillePixel" --font block --border "#"
+python ascii_text.py "HELLO" --font simple --gradient
+```
+
+## 🖼️ Sample Output
+
+**Braille Art** (high resolution):
+```
+⠀⠀⢠⣶⣄⠀⠀⣴⣦⠀⠀
+⢀⣿⣿⣿⡆⢸⣿⣿⣿⡇
+⢸⣿⣿⣿⡇⢸⣿⣿⣿⡇
+⠈⣿⣿⣿⠇⢸⣿⣿⣿⡇
+⠀⠈⠛⠋⠀⠀⠈⠛⠋⠀
+```
+
+**Emoji Art**:
+```
+🔥🔥 🔥🔥🔥 🔥    🔥    🔥🔥🔥  
+🔥   🔥      🔥    🔥    🔥   🔥 
+🔥🔥🔥🔥 🔥🔥🔥 🔥    🔥    🔥   🔥 
+🔥   🔥      🔥    🔥    🔥   🔥 
+🔥   🔥  🔥🔥🔥🔥 🔥🔥🔥🔥 🔥🔥🔥  
+```
+
+**ASCII Text**:
+```
+##################################################
+# ██ ██ ████ ██   ██    ███   ████ ### ### ### ██ #
+# █████ ███  ██   ██   ██ ██ ███   # # # # # # ██ #
+# ██ ██ ███  ██   ██   ██ ██ ███   # # # # # # ██ #
+# ██ ██ ████ ████ ████  ███  █████ ### ### ### ██ #
+##################################################
+```
+
+## 🎨 Web Interface Features
+- **Drag & drop** image uploads
+- **Real-time** parameter adjustment
+- **Multiple tabs** for different art types
+- **Copy/Download** generated art
+- **Mobile responsive** design
+
+## 🛠️ Technical Details
+
+### Braille Art
+- Maps 2x4 pixel blocks → single Braille character (U+2800-U+28FF)
+- Higher vertical resolution than ASCII
+- Configurable dimensions & brightness threshold
+
+### Emoji Art
+- **Image mode**: Converts brightness → emoji density
+- **Text mode**: Renders text as emoji patterns
+- **6 built-in sets**: faces, hearts, nature, geometric, animals, food
+- **Custom emoji support**
+
+### ASCII Text
+- **Font styles**: Block, Simple (extensible)
+- **Effects**: Borders, gradients, spacing
+- **Pattern-based** character generation
+
+## 🔧 Installation & Setup
+```bash
+# Clone repo
+git clone https://github.com/Harihara04sudhan/BraillePixel.git
+cd BraillePixel
+
+# Setup virtual environment
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate  # Linux/Mac
+# .venv\Scripts\activate   # Windows
+
+# Install dependencies
 pip install -r requirements.txt
-python textart.py /path/to/image.jpg --cols 80
-```
-If no image path is provided it defaults to `smiley.jpeg` inside the project directory.
 
-## CLI Usage
-```bash
-python textart.py [image] [--cols N] [--rows N] [--max-cols N] [--threshold T]
-```
-Arguments:
-- image: (optional) path to an image file. Defaults to bundled path.
-- --cols: Target number of Braille columns (width). Scales image to fit.
-- --rows: Target number of Braille rows (height). Scales to fit.
-- --cols + --rows: Scales to fit inside both (like "contain").
-- --max-cols: Only shrink if wider than this many columns (preserve if smaller).
-- --threshold: Grayscale cutoff 0–255 (lower = lighter output). Default: 127.
+# Test all features
+python demo.py
 
-Priority logic:
-1. If --cols or --rows specified, they drive scaling (fit inside box).
-2. Else if --max-cols specified, shrink only if necessary.
-3. Else original size (cropped to even multiples of Braille cell size) is used.
-
-## Examples
-```bash
-# Simple render at 60 columns
-python textart.py cat.png --cols 60
-
-# Limit by rows instead (e.g. fit small terminal height)
-python textart.py portrait.jpg --rows 30
-
-# Fit inside width AND height bounds
-python textart.py scene.jpeg --cols 80 --rows 40
-
-# Only shrink if too wide
-python textart.py logo.png --max-cols 100
-
-# Darker output (raise threshold)
-python textart.py face.jpg --cols 70 --threshold 150
-
-# Lighter output (lower threshold)
-python textart.py face.jpg --cols 70 --threshold 90
+# Start web interface
+python web_server.py
 ```
 
-## Sample Output
-```
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⢠⣶⣄⠀⠀⣴⣦⠀⠀⠀
-⠀⢀⣿⣿⣿⡆⢸⣿⣿⣿⡇⠀
-⠀⠈⣿⣿⣿⠇⢸⣿⣿⣿⡇⠀
-⠀⠀⠈⠛⠋⠀⠀⠈⠛⠋⠀⠀
-```
-(Result using a simplified demo image at 18 cols.)
+## 🎯 Requirements
+- **Python 3.9+** (tested on 3.13)
+- **Pillow** (image processing)
+- **Flask + Flask-CORS** (web interface)
 
-## How It Works
-1. Image is converted to 8-bit grayscale.
-2. Optionally rescaled to target Braille cell dimensions.
-3. Image is cropped so width is multiple of 2 and height multiple of 4.
-4. Each 2x4 block maps to a Braille symbol by setting bits for dark pixels.
+## 📝 CLI Arguments
 
-Braille dot layout:
-```
-1 4
-2 5
-3 6
-7 8
-```
-Each active dot sets a bit (dot_index - 1) added to base code point U+2800.
+### textart.py (Braille)
+- `--cols N` - Target columns
+- `--rows N` - Target rows  
+- `--threshold N` - Brightness threshold (0-255)
 
-## Output Piping / Viewing
-If your terminal scrolls a lot:
-```bash
-python textart.py image.jpg --cols 100 | less -R
-```
-`-R` preserves Unicode without escaping.
+### emoji_art.py
+- `--mode {image,text}` - Input type
+- `--emoji EMOJI` - Single emoji (text mode)
+- `--emoji-set SET` - Predefined set
+- `--custom-emojis LIST` - Custom comma-separated emojis
+- `--width N` - Output width
 
-## Performance Notes
-- Scaling uses Pillow's bicubic filter (fast & smooth for small terminal previews).
-- Each Braille char replaces 8 pixels (2x4), reducing data volume sharply.
-- Typical 80x40 cell output processes in milliseconds on modern hardware.
+### ascii_text.py  
+- `--font {block,simple}` - Font style
+- `--spacing N` - Character spacing
+- `--border CHAR` - Add border
+- `--gradient` - Apply gradient effect
 
-## Roadmap / Ideas
-- Invert mode
-- Auto threshold via Otsu method
-- Color approximation (ANSI) pre-pass
-- Export to text file (`--out`)
-- GIF frame animation
-- Optional dithering (Floyd–Steinberg) before threshold
+## 🔮 Roadmap
+- [ ] **Color support** (ANSI/terminal colors)
+- [ ] **More ASCII fonts** 
+- [ ] **Animation support** (GIF frames)
+- [ ] **Batch processing** mode
+- [ ] **Auto-threshold** (Otsu method)
+- [ ] **Invert mode** toggle
 
-## Troubleshooting
-| Issue | Fix |
-|-------|-----|
-| ModuleNotFoundError: PIL | Run `pip install -r requirements.txt` |
-| Output too tall | Use `--rows` or reduce `--cols` |
-| Too dark / light | Adjust `--threshold` |
-| Distorted aspect | Only specify one of `--cols` or `--rows` |
-| Unicode blocks show as blanks | Use a font with Braille range support |
+## 🤝 Contributing
+1. Fork → create feature branch
+2. Install: `pip install -r requirements.txt`
+3. Test your changes across all tools
+4. Include before/after samples
+5. Submit PR
 
-## Contributing
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feat/my-change`
-3. Install deps: `pip install -r requirements.txt`
-4. Add a before/after snippet if visual change
-5. Open PR
+## 🐛 Troubleshooting
+| Issue | Solution |
+|-------|----------|
+| Import errors | `pip install -r requirements.txt` |
+| Web UI not loading | Check `python web_server.py` output |
+| Unicode not displaying | Use Unicode-compatible terminal/font |
+| Images too large | Use `--cols` to limit dimensions |
+| Art too dark/light | Adjust `--threshold` value |
 
-## License
-MIT
+## 📄 License
+MIT License - see [LICENSE](LICENSE)
+
+## 🔗 Links
+- **GitHub**: https://github.com/Harihara04sudhan/BraillePixel
+- **Issues**: https://github.com/Harihara04sudhan/BraillePixel/issues
+- **Web Demo**: Run `python web_server.py` → http://localhost:5000
 
 ---
-Feel free to open issues or extend the script.
+**Made with ❤️ by Hari** | Star ⭐ if you find this useful!
