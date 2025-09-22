@@ -216,9 +216,15 @@ header p {
 
 .output-header h2 {
     color: #4a5568;
+    margin: 0;
 }
 
-.copy-btn, .download-btn {
+.output-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.copy-btn, .select-btn, .download-btn {
     background: #48bb78;
     color: white;
     border: none;
@@ -227,12 +233,20 @@ header p {
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
-    margin-left: 10px;
+    font-size: 0.9em;
 }
 
-.copy-btn:hover, .download-btn:hover {
+.copy-btn:hover, .select-btn:hover {
     background: #38a169;
     transform: translateY(-1px);
+}
+
+.select-btn {
+    background: #805ad5;
+}
+
+.select-btn:hover {
+    background: #6b46c1;
 }
 
 .download-btn {
@@ -298,13 +312,19 @@ footer a:hover {
     
     .output-header {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
         align-items: stretch;
     }
     
-    .copy-btn, .download-btn {
-        width: 100%;
-        margin: 5px 0;
+    .output-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .copy-btn, .select-btn, .download-btn {
+        flex: 1;
+        min-width: 120px;
+        margin: 0;
     }
 }
 

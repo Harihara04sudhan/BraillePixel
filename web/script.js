@@ -397,18 +397,76 @@ function generateDemoASCIIArt(text, font, spacing, border, gradient) {
 // Utility functions
 function copyOutput() {
     const output = document.getElementById('output');
-    navigator.clipboard.writeText(output.textContent).then(() => {
-        // Show feedback
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.textContent = '✓ Copied!';
-        setTimeout(() => {
-            btn.textContent = originalText;
-        }, 2000);
-    }).catch(err => {
-        console.error('Failed to copy: ', err);
-        alert('Failed to copy to clipboard');
-    });
+    const text = output.textContent;
+    
+    // Try modern clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+            showCopySuccess();
+        }).catch(err => {
+            console.error('Clipboard API failed:', err);
+            fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        // Fallback for older browsers or non-secure contexts
+        fallbackCopyTextToClipboard(text);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    // Create temporary textarea
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Avoid scrolling to bottom
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    textArea.style.opacity = "0";
+    textArea.style.pointerEvents = "none";
+    
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showCopySuccess();
+        } else {
+            showCopyError();
+        }
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        showCopyError();
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showCopySuccess() {
+    const btn = document.querySelector('.copy-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.style.background = '#48bb78';
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+    }, 2000);
+}
+
+function showCopyError() {
+    const btn = document.querySelector('.copy-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '❌ Copy Failed';
+    btn.style.background = '#e53e3e';
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+    }, 2000);
+    
+    // Also show browser-specific instructions
+    alert('Copy failed. Try:\n- Right-click the output and select "Copy"\n- Or select all text manually (Ctrl+A) then copy (Ctrl+C)');
 }
 
 function downloadOutput() {
@@ -474,3 +532,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function selectOutput() {
+    const output = document.getElementById('output');
+    
+    // Create a range and select the output content
+    if (document.createRange && window.getSelection) {
+        const range = document.createRange();
+        range.selectNodeContents(output);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        // Show feedback
+        const btn = document.querySelector('.select-btn');
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Selected';
+        btn.style.background = '#805ad5';
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.background = '';
+        }, 2000);
+        
+        // Scroll to output
+        output.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+    } else if (document.body.createTextRange) {
+        // Fallback for older IE
+        const range = document.body.createTextRange();
+        range.moveToElementText(output);
+        range.select();
+    }
+}

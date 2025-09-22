@@ -156,10 +156,18 @@
         <div class="output-section">
             <div class="output-header">
                 <h2>Output</h2>
-                <button onclick="copyOutput()" class="copy-btn">📋 Copy</button>
-                <button onclick="downloadOutput()" class="download-btn">💾 Download</button>
+                <div class="output-buttons">
+                    <button onclick="copyOutput()" class="copy-btn">📋 Copy</button>
+                    <button onclick="selectOutput()" class="select-btn">🔤 Select All</button>
+                    <button onclick="downloadOutput()" class="download-btn">💾 Download</button>
+                </div>
             </div>
-            <pre id="output" class="output-area">Your generated art will appear here...</pre>
+            <pre id="output" class="output-area">Your generated art will appear here...
+
+💡 Tips:
+- Use 📋 Copy to copy to clipboard
+- Use 🔤 Select All then Ctrl+C if copy fails
+- Use 💾 Download to save as text file</pre>
         </div>
 
         <footer>
