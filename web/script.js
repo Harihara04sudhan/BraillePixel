@@ -42,17 +42,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Handle emoji render mode switching (gradient vs binary)
+    const renderModeInputs = document.querySelectorAll('input[name="emoji-render-mode"]');
+    renderModeInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const gradientControls = document.getElementById('gradient-controls');
+            const binaryControls = document.getElementById('binary-controls');
+            
+            if (this.value === 'gradient') {
+                gradientControls.style.display = 'block';
+                binaryControls.style.display = 'none';
+            } else {
+                gradientControls.style.display = 'none';
+                binaryControls.style.display = 'block';
+            }
+        });
+    });
+    
     // Handle emoji set selection
     const emojiSetSelect = document.getElementById('emoji-set');
     const customEmojiInput = document.getElementById('custom-emoji-input');
     
     emojiSetSelect.addEventListener('change', function() {
         if (this.value === 'custom') {
-            customEmojiInput.style.display = 'flex';
+            customEmojiInput.style.display = 'block';
         } else {
             customEmojiInput.style.display = 'none';
         }
     });
+    
+    // Initialize custom emoji input visibility
+    if (emojiSetSelect.value === 'custom') {
+        customEmojiInput.style.display = 'block';
+    } else {
+        customEmojiInput.style.display = 'none';
+    }
 });
 
 // Braille Art Generation (Real API calls)
@@ -131,6 +155,7 @@ function generateDemoBrailleArt(cols, rows) {
 // Emoji Art Generation (Real API calls)
 function generateEmoji() {
     const mode = document.querySelector('input[name="emoji-mode"]:checked').value;
+    const renderMode = document.querySelector('input[name="emoji-render-mode"]:checked').value;
     const output = document.getElementById('output');
     
     if (mode === 'image') {
@@ -145,9 +170,27 @@ function generateEmoji() {
         
         reader.onload = function(e) {
             const imageData = e.target.result;
-            const emojiSet = document.getElementById('emoji-set').value;
-            const customEmoji = document.getElementById('custom-emoji').value;
             const width = document.getElementById('emoji-width').value;
+            
+            let requestData = {
+                mode: 'image',
+                image: imageData,
+                width: parseInt(width),
+                binary_mode: renderMode === 'binary'
+            };
+            
+            if (renderMode === 'binary') {
+                // Binary mode parameters
+                requestData.on_emoji = document.getElementById('on-emoji').value || '🔥';
+                requestData.off_emoji = document.getElementById('off-emoji').value || '⚪';
+                requestData.threshold = parseInt(document.getElementById('emoji-threshold').value);
+            } else {
+                // Gradient mode parameters
+                const emojiSet = document.getElementById('emoji-set').value;
+                const customEmoji = document.getElementById('custom-emoji').value;
+                requestData.emoji_set = emojiSet;
+                requestData.custom_emojis = customEmoji;
+            }
             
             output.textContent = 'Generating emoji art...';
             
@@ -156,13 +199,7 @@ function generateEmoji() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    mode: 'image',
-                    image: imageData,
-                    width: parseInt(width),
-                    emoji_set: emojiSet,
-                    custom_emojis: customEmoji
-                })
+                body: JSON.stringify(requestData)
             })
             .then(response => response.json())
             .then(data => {
@@ -181,15 +218,28 @@ function generateEmoji() {
         reader.readAsDataURL(file);
         
     } else {
-        // Text mode
+        // Text mode (always uses binary mode for clarity)
         const text = document.getElementById('emoji-text').value;
-        const customEmoji = document.getElementById('custom-emoji').value;
         const width = document.getElementById('emoji-width').value;
         
         if (!text) {
             output.textContent = 'Please enter text to convert.';
             return;
         }
+        
+        let onEmoji, offEmoji;
+        if (renderMode === 'binary') {
+            onEmoji = document.getElementById('on-emoji').value || '🔥';
+            offEmoji = document.getElementById('off-emoji').value || '⚪';
+        } else {
+            // Use first custom emoji or default for text mode
+            const customEmoji = document.getElementById('custom-emoji').value;
+            onEmoji = customEmoji ? customEmoji.split(',')[0].trim() : '🔥';
+            offEmoji = '⚪';  // Always use contrasting background for text clarity
+        }
+        
+        const threshold = document.getElementById('emoji-threshold') ? 
+                         parseInt(document.getElementById('emoji-threshold').value) : 128;
         
         output.textContent = 'Generating emoji art...';
         
@@ -201,8 +251,10 @@ function generateEmoji() {
             body: JSON.stringify({
                 mode: 'text',
                 text: text,
-                emoji: customEmoji || '🔥',
-                width: parseInt(width)
+                on_emoji: onEmoji,
+                off_emoji: offEmoji,
+                width: parseInt(width),
+                threshold: threshold
             })
         })
         .then(response => response.json())

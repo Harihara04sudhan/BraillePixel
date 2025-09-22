@@ -58,97 +58,172 @@
 
         <!-- Emoji Art Tab -->
         <div id="emoji" class="tab-content">
-            <div class="input-section">
-                <h2>Emoji Art Generator</h2>
+            <div class="input-section emoji-section">
+                <h2>🎨 Emoji Art Generator</h2>
                 
-                <div class="mode-selector">
-                    <label>
-                        <input type="radio" name="emoji-mode" value="image" checked> Image to Emoji
-                    </label>
-                    <label>
-                        <input type="radio" name="emoji-mode" value="text"> Text to Emoji
-                    </label>
-                </div>
-                
-                <div id="emoji-image-input">
-                    <div class="upload-area" id="emoji-upload">
-                        <input type="file" id="emoji-file" accept="image/*">
-                        <p>📤 Upload image for emoji conversion</p>
+                <!-- Input Source Selection -->
+                <div class="input-mode-section">
+                    <h3>📋 Choose Input Source</h3>
+                    <div class="mode-selector">
+                        <label>
+                            <input type="radio" name="emoji-mode" value="image" checked>
+                            <span>📸 Image to Emoji</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="emoji-mode" value="text">
+                            <span>✏️ Text to Emoji</span>
+                        </label>
+                    </div>
+                    
+                    <div id="emoji-image-input">
+                        <div class="upload-area" id="emoji-upload">
+                            <input type="file" id="emoji-file" accept="image/*">
+                            <p>📤 Upload image for emoji conversion</p>
+                        </div>
+                    </div>
+                    
+                    <div id="emoji-text-input" style="display: none;">
+                        <div class="text-input-container">
+                            <h4>✏️ Enter Text to Convert</h4>
+                            <input type="text" id="emoji-text" placeholder="Enter your text (e.g., HELLO, LOVE, TVK)" class="large-text-input">
+                            <p class="input-help">💡 Best results with short text (1-10 characters). Try: names, words, initials!</p>
+                        </div>
                     </div>
                 </div>
                 
-                <div id="emoji-text-input" style="display: none;">
-                    <label>
-                        Text to convert:
-                        <input type="text" id="emoji-text" placeholder="Enter your text">
-                    </label>
+                <!-- Render Mode Selection -->
+                <div class="render-mode-section">
+                    <h3>🎯 Choose Render Style</h3>
+                    <div class="mode-toggle">
+                        <label>
+                            <input type="radio" name="emoji-render-mode" value="gradient" checked>
+                            <span>🌈 Gradient Mode</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="emoji-render-mode" value="binary">
+                            <span>⚫⚪ Binary Mode</span>
+                        </label>
+                    </div>
                 </div>
                 
-                <div class="controls">
-                    <label>
-                        Emoji Set:
-                        <select id="emoji-set">
-                            <option value="custom">Custom</option>
-                            <option value="faces">Faces</option>
-                            <option value="hearts">Hearts</option>
-                            <option value="nature">Nature</option>
-                            <option value="geometric">Geometric</option>
-                            <option value="animals">Animals</option>
-                            <option value="food">Food</option>
-                        </select>
-                    </label>
+                <!-- Emoji Controls -->
+                <div class="emoji-controls-section">
+                    <h3>⚙️ Emoji Settings</h3>
                     
-                    <label id="custom-emoji-input">
-                        Custom Emoji:
-                        <input type="text" id="custom-emoji" placeholder="🔥,⭐,✨,💫" value="🔥">
-                    </label>
+                    <div id="gradient-controls">
+                        <div class="emoji-input-row">
+                            <label>
+                                <span>Emoji Set:</span>
+                                <select id="emoji-set">
+                                    <option value="geometric" selected>🔸 Geometric</option>
+                                    <option value="faces">😀 Faces</option>
+                                    <option value="hearts">💖 Hearts</option>
+                                    <option value="nature">🌱 Nature</option>
+                                    <option value="animals">🐱 Animals</option>
+                                    <option value="food">🍕 Food</option>
+                                    <option value="custom">✨ Custom</option>
+                                </select>
+                            </label>
+                        </div>
+                        
+                        <div id="custom-emoji-input" style="display: none;">
+                            <label>
+                                <span>Custom Emojis (light to dark):</span>
+                                <input type="text" id="custom-emoji" placeholder="🔥,⭐,✨,💫,🌟">
+                                <small style="color: #718096; font-size: 0.9em;">Separate emojis with commas</small>
+                            </label>
+                        </div>
+                    </div>
                     
-                    <label>
-                        Width:
+                    <div id="binary-controls" style="display: none;">
+                        <div class="emoji-input-row">
+                            <label>
+                                <span>"On" Emoji (foreground):</span>
+                                <input type="text" id="on-emoji" value="🔥" maxlength="5">
+                            </label>
+                            
+                            <label>
+                                <span>"Off" Emoji (background):</span>
+                                <input type="text" id="off-emoji" value="⚪" maxlength="5">
+                            </label>
+                        </div>
+                        
+                        <div class="threshold-control">
+                            <label>Brightness Threshold:</label>
+                            <input type="range" id="emoji-threshold" min="0" max="255" value="128">
+                            <span id="emoji-threshold-val">128</span>
+                        </div>
+                    </div>
+                    
+                    <div class="width-control">
+                        <label>Output Width:</label>
                         <input type="range" id="emoji-width" min="20" max="100" value="60">
                         <span id="emoji-width-val">60</span>
-                    </label>
+                    </div>
                 </div>
                 
-                <button onclick="generateEmoji()" class="generate-btn">Generate Emoji Art</button>
+                <button onclick="generateEmoji()" class="generate-btn">🚀 Generate Emoji Art</button>
             </div>
         </div>
 
         <!-- ASCII Text Tab -->
         <div id="ascii" class="tab-content">
-            <div class="input-section">
-                <h2>ASCII Text Art</h2>
+            <div class="input-section ascii-section">
+                <h2>📝 ASCII Text Art Generator</h2>
                 
-                <label>
-                    Text to convert:
-                    <input type="text" id="ascii-text" placeholder="HELLO" value="HELLO">
-                </label>
-                
-                <div class="controls">
-                    <label>
-                        Font Style:
-                        <select id="ascii-font">
-                            <option value="block">Block</option>
-                            <option value="simple">Simple</option>
-                        </select>
-                    </label>
-                    
-                    <label>
-                        Character Spacing:
-                        <input type="range" id="ascii-spacing" min="0" max="5" value="1">
-                        <span id="ascii-spacing-val">1</span>
-                    </label>
-                    
-                    <label>
-                        <input type="checkbox" id="ascii-border"> Add Border
-                    </label>
-                    
-                    <label>
-                        <input type="checkbox" id="ascii-gradient"> Gradient Effect
-                    </label>
+                <!-- Text Input Section -->
+                <div class="ascii-text-section">
+                    <h3>✏️ Enter Your Text</h3>
+                    <div class="ascii-text-container">
+                        <input type="text" id="ascii-text" placeholder="Enter your text (e.g., HELLO, WORLD, CODE)" value="HELLO" class="ascii-text-input">
+                        <p class="input-help">💡 Works best with short text and uppercase letters!</p>
+                    </div>
                 </div>
                 
-                <button onclick="generateASCII()" class="generate-btn">Generate ASCII Art</button>
+                <!-- Style Settings Section -->
+                <div class="ascii-style-section">
+                    <h3>🎨 Style Settings</h3>
+                    
+                    <div class="ascii-style-grid">
+                        <div class="style-control">
+                            <label>
+                                <span class="control-label">🔤 Font Style</span>
+                                <select id="ascii-font">
+                                    <option value="block">█ Block Style</option>
+                                    <option value="simple">▪ Simple Style</option>
+                                </select>
+                            </label>
+                        </div>
+                        
+                        <div class="style-control">
+                            <label>
+                                <span class="control-label">↔️ Character Spacing</span>
+                                <div class="range-control">
+                                    <input type="range" id="ascii-spacing" min="0" max="5" value="1">
+                                    <span class="range-value" id="ascii-spacing-val">1</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Effect Options -->
+                    <div class="ascii-effects-section">
+                        <h4>✨ Special Effects</h4>
+                        <div class="effect-options">
+                            <label class="effect-option">
+                                <input type="checkbox" id="ascii-border">
+                                <span class="effect-label">🔲 Add Border Frame</span>
+                            </label>
+                            
+                            <label class="effect-option">
+                                <input type="checkbox" id="ascii-gradient">
+                                <span class="effect-label">🌈 Gradient Effect</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="generateASCII()" class="generate-btn">🚀 Generate ASCII Art</button>
             </div>
         </div>
 

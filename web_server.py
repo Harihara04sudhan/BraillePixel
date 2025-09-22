@@ -69,13 +69,15 @@ def generate_emoji_api():
         
         if mode == 'text':
             text = data.get('text', '')
-            emoji = data.get('emoji', '🔥')
+            on_emoji = data.get('on_emoji', data.get('emoji', '🔥'))  # Support both old and new parameter names
+            off_emoji = data.get('off_emoji', '⚪')
             width = data.get('width', 80)
+            threshold = data.get('threshold', 128)
             
             if not text:
                 return jsonify({'error': 'No text provided'}), 400
             
-            result = text_to_emoji_art(text, emoji, width)
+            result = text_to_emoji_art(text, on_emoji=on_emoji, off_emoji=off_emoji, width=width, binary_threshold=threshold)
             
         else:  # image mode
             if 'image' not in data:
@@ -87,20 +89,35 @@ def generate_emoji_api():
             
             # Get parameters
             width = data.get('width', 80)
+            binary_mode = data.get('binary_mode', False)
+            on_emoji = data.get('on_emoji', '🔥')
+            off_emoji = data.get('off_emoji', '⚪')
+            threshold = data.get('threshold', 128)
             emoji_set = data.get('emoji_set', 'geometric')
             custom_emojis = data.get('custom_emojis', '')
             
-            # Determine emoji list
-            if custom_emojis:
-                emoji_list = [e.strip() for e in custom_emojis.split(',') if e.strip()]
-            elif emoji_set in EMOJI_SETS:
-                emoji_list = EMOJI_SETS[emoji_set]
-            else:
-                emoji_list = EMOJI_SETS['geometric']
-            
             # Process image
             img = resize_image(img, width)
-            result = image_to_emoji_mosaic(img, emoji_list)
+            
+            if binary_mode:
+                # Binary mode with on/off emojis
+                result = image_to_emoji_mosaic(
+                    img, 
+                    binary_mode=True,
+                    on_emoji=on_emoji,
+                    off_emoji=off_emoji,
+                    threshold=threshold
+                )
+            else:
+                # Gradient mode with emoji sets
+                if custom_emojis:
+                    emoji_list = [e.strip() for e in custom_emojis.split(',') if e.strip()]
+                elif emoji_set in EMOJI_SETS:
+                    emoji_list = EMOJI_SETS[emoji_set]
+                else:
+                    emoji_list = EMOJI_SETS['geometric']
+                
+                result = image_to_emoji_mosaic(img, emoji_list=emoji_list, binary_mode=False)
         
         return jsonify({'result': result})
         

@@ -266,8 +266,8 @@ FONTS = {
         ],
         'B': [
             "### ",
-            "# ##",
-            "### ",
+            "####",
+            "####",
             "### "
         ],
         'C': [
@@ -505,7 +505,33 @@ FONTS = {
             "   "
         ]
     }
+            "  ",
+            "  ",
+            "  "
+        ]
+    }
 }
+
+# Add basic alphabet to fonts
+def expand_font(base_font):
+    """Expand font with basic patterns for missing letters"""
+    alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    
+    # Add missing letters with placeholder patterns
+    for letter in alphabet:
+        if letter not in base_font:
+            if letter.isdigit():
+                # Numbers get O-like pattern
+                base_font[letter] = base_font.get('O', ['###', '# #', '# #', '###'])
+            else:
+                # Other letters get simple block
+                base_font[letter] = ['###', '# #', '# #', '###']
+    
+    return base_font
+
+# Expand all fonts
+for font_name in FONTS:
+    FONTS[font_name] = expand_font(FONTS[font_name])
 
 def text_to_ascii_art(text, font='block', spacing=1):
     """Convert text to ASCII art using specified font"""
@@ -516,9 +542,6 @@ def text_to_ascii_art(text, font='block', spacing=1):
         return ""
     
     # Get height of font
-    if not font_data:
-        return "Error: Font not found"
-    
     height = len(font_data[list(font_data.keys())[0]])
     
     # Build each line
@@ -529,11 +552,8 @@ def text_to_ascii_art(text, font='block', spacing=1):
             if char in font_data:
                 line += font_data[char][row]
             else:
-                # Unknown character - use space or default pattern
-                if ' ' in font_data:
-                    line += font_data[' '][row]
-                else:
-                    line += '   '  # fallback spaces
+                # Unknown character - use space
+                line += font_data[' '][row]
             
             # Add spacing between characters
             if char != ' ':
