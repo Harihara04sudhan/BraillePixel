@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Braille Function on Netlify</title>
+</head>
+<body>
+    <h2>Test Braille Function</h2>
+    <button onclick="testBrailleAPI()">Test Braille API</button>
+    <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; white-space: pre-wrap; font-family: monospace;"></div>
+
+    <script>
+        async function testBrailleAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Testing...';
+            
+            // Create test image data (small black square)
+            const testImageData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNkYPhfz0AEYBxVSF+FAP//AwBVgAFNSZtjlAAAAABJRU5ErkJggg==';
+            
+            try {
+                console.log('Testing braille endpoint...');
+                const response = await fetch('/.netlify/functions/braille', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: testImageData,
+                        cols: 40,
+                        threshold: 127,
+                        invert: false
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (data.error) {
+                    resultDiv.textContent = 'Error: ' + data.error;
+                } else {
+                    resultDiv.textContent = 'Success!\n\nBraille Output:\n' + data.result;
+                }
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                resultDiv.textContent = 'Test failed: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
