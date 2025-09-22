@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BraillePixel Debug - Text Art Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐛 BraillePixel Debug Mode</h1>
+            <p>Debug version with enhanced logging - Check browser console!</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('braille')">📱 Braille Art</button>
+            <button class="tab-btn" onclick="showTab('emoji')">😀 Emoji Art</button>
+            <button class="tab-btn" onclick="showTab('ascii')">📝 ASCII Text</button>
+        </div>
+
+        <!-- Braille Art Tab -->
+        <div id="braille" class="tab-content active">
+            <div class="input-section">
+                <h2>Image to Braille Art</h2>
+                <div class="upload-area" id="braille-upload">
+                    <input type="file" id="braille-file" accept="image/*">
+                    <p>📤 Click to upload image or drag & drop</p>
+                </div>
+                
+                <div class="controls">
+                    <label>
+                        Columns: 
+                        <input type="range" id="braille-cols" min="20" max="120" value="40">
+                        <span id="braille-cols-val">40</span>
+                    </label>
+                    
+                    <label>
+                        Rows: 
+                        <input type="range" id="braille-rows" min="10" max="60" value="20">
+                        <span id="braille-rows-val">20</span>
+                    </label>
+                    
+                    <label>
+                        Threshold: 
+                        <input type="range" id="braille-threshold" min="0" max="255" value="127">
+                        <span id="braille-threshold-val">127</span>
+                    </label>
+                    
+                    <label>
+                        <input type="checkbox" id="braille-invert"> Invert (light on dark)
+                    </label>
+                </div>
+                
+                <button onclick="generateBraille()" class="generate-btn">Generate Braille Art (Original)</button>
+            </div>
+        </div>
+
+        <!-- Simple tabs for other content -->
+        <div id="emoji" class="tab-content">
+            <h2>Emoji Art (Debug Mode)</h2>
+            <p>Check console for detailed logs</p>
+        </div>
+
+        <div id="ascii" class="tab-content">
+            <h2>ASCII Art (Debug Mode)</h2>
+            <p>Check console for detailed logs</p>
+        </div>
+
+        <div class="output-section">
+            <h2>Output</h2>
+            <div id="output">Upload an image and click generate to see your art!</div>
+        </div>
+    </div>
+
+    <!-- Load the original script first -->
+    <script src="script.js"></script>
+    <!-- Then load our debug enhancements -->
+    <script src="debug.js"></script>
+
+    <script>
+        // Tab functionality (simplified for debug)
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Update range slider displays
+        document.addEventListener('DOMContentLoaded', function() {
+            const rangeInputs = document.querySelectorAll('input[type="range"]');
+            rangeInputs.forEach(input => {
+                const valueSpan = document.getElementById(input.id + '-val');
+                if (valueSpan) {
+                    input.addEventListener('input', () => {
+                        valueSpan.textContent = input.value;
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
