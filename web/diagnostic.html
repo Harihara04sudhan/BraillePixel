@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Site Diagnostic Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin-bottom: 30px; border: 1px solid #ddd; padding: 15px; }
+        .result { margin-top: 10px; padding: 10px; border-radius: 5px; white-space: pre-wrap; font-family: monospace; }
+        .success { background-color: #d4edda; border-left: 4px solid #28a745; }
+        .error { background-color: #f8d7da; border-left: 4px solid #dc3545; }
+        .info { background-color: #d1ecf1; border-left: 4px solid #17a2b8; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Live Site Diagnostic Test</h1>
+    <p>This page will test all API endpoints and help identify the issue with image-to-braille generation.</p>
+    
+    <div class="test-section">
+        <h2>1. Environment Detection</h2>
+        <button onclick="testEnvironment()">Test Environment</button>
+        <div id="env-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. API Endpoints Availability</h2>
+        <button onclick="testEndpoints()">Test All Endpoints</button>
+        <div id="endpoints-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Braille Function Test</h2>
+        <button onclick="testBrailleFunction()">Test Braille Generation</button>
+        <div id="braille-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Full Image Upload Simulation</h2>
+        <input type="file" id="test-file" accept="image/*">
+        <button onclick="testImageUpload()">Test Image Upload</button>
+        <div id="upload-result" class="result"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+            console.log(message);
+        }
+
+        function testEnvironment() {
+            const info = {
+                hostname: window.location.hostname,
+                protocol: window.location.protocol,
+                port: window.location.port,
+                userAgent: navigator.userAgent,
+                isProduction: window.location.hostname.includes('netlify.app'),
+                timestamp: new Date().toISOString()
+            };
+            
+            log('env-result', `Environment Info:
+${JSON.stringify(info, null, 2)}`, 'info');
+        }
+
+        async function testEndpoints() {
+            const endpoints = ['braille', 'emoji', 'ascii', 'emoji-sets'];
+            let results = 'Testing API Endpoints...\n\n';
+            
+            for (const endpoint of endpoints) {
+                const url = `/.netlify/functions/${endpoint}`;
+                try {
+                    const response = await fetch(url, { method: 'OPTIONS' });
+                    results += `✅ ${endpoint}: ${response.status} ${response.statusText}\n`;
+                } catch (error) {
+                    results += `❌ ${endpoint}: ${error.message}\n`;
+                }
+            }
+            
+            log('endpoints-result', results, 'success');
+        }
+
+        async function testBrailleFunction() {
+            // Small test image (10x10 black square)
+            const testImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNkYPhfz0AEYBxVSF+FAP//AwBVgAFNSZtjlAAAAABJRU5ErkJggg==';
+            
+            try {
+                log('braille-result', 'Testing braille function...', 'info');
+                
+                const response = await fetch('/.netlify/functions/braille', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: testImage,
+                        cols: 30,
+                        threshold: 127,
+                        invert: false
+                    })
+                });
+                
+                const responseText = await response.text();
+                
+                if (response.ok) {
+                    try {
+                        const data = JSON.parse(responseText);
+                        if (data.result) {
+                            log('braille-result', `✅ Success!
+Status: ${response.status}
+Result Length: ${data.result.length}
+Debug Info: ${JSON.stringify(data.debug, null, 2)}
+
+Sample Output:
+${data.result.substring(0, 200)}${data.result.length > 200 ? '...' : ''}`, 'success');
+                        } else {
+                            log('braille-result', `❌ No result in response:
+${responseText}`, 'error');
+                        }
+                    } catch (parseError) {
+                        log('braille-result', `❌ JSON Parse Error:
+${parseError.message}
+Response: ${responseText}`, 'error');
+                    }
+                } else {
+                    log('braille-result', `❌ HTTP Error:
+Status: ${response.status} ${response.statusText}
+Response: ${responseText}`, 'error');
+                }
+                
+            } catch (error) {
+                log('braille-result', `❌ Network Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testImageUpload() {
+            const fileInput = document.getElementById('test-file');
+            if (!fileInput.files[0]) {
+                log('upload-result', 'Please select an image file first.', 'error');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            log('upload-result', `Processing file: ${file.name} (${file.size} bytes)...`, 'info');
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const imageData = e.target.result;
+                
+                try {
+                    const response = await fetch('/.netlify/functions/braille', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            image: imageData,
+                            cols: 40,
+                            threshold: 127,
+                            invert: false
+                        })
+                    });
+                    
+                    const responseText = await response.text();
+                    
+                    if (response.ok) {
+                        try {
+                            const data = JSON.parse(responseText);
+                            if (data.result) {
+                                log('upload-result', `✅ Image processed successfully!
+File: ${file.name}
+Size: ${file.size} bytes
+Result Length: ${data.result.length} characters
+Processing Time: ${data.debug?.processingTime || 'N/A'} ms
+
+Sample Output:
+${data.result.substring(0, 300)}${data.result.length > 300 ? '...' : ''}`, 'success');
+                            } else {
+                                log('upload-result', `❌ No result in response: ${responseText}`, 'error');
+                            }
+                        } catch (parseError) {
+                            log('upload-result', `❌ JSON Parse Error: ${parseError.message}`, 'error');
+                        }
+                    } else {
+                        log('upload-result', `❌ HTTP Error: ${response.status} ${response.statusText}
+Response: ${responseText}`, 'error');
+                    }
+                    
+                } catch (error) {
+                    log('upload-result', `❌ Error: ${error.message}`, 'error');
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Auto-run basic tests on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                testEnvironment();
+                testEndpoints();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
