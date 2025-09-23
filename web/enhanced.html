@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BraillePixel - FIXED VERSION</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .status-banner {
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .debug-info {
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-banner">
+        🚀 ENHANCED VERSION - Comprehensive Error Handling & Debugging Active
+    </div>
+    
+    <div id="debug-info" class="debug-info" style="display: none;"></div>
+    
+    <div class="container">
+        <header>
+            <h1>🎨 BraillePixel Art Generator - ENHANCED</h1>
+            <p>Convert images and text to various ASCII/Unicode art formats</p>
+            <p style="color: #666; font-size: 14px;">
+                🔧 This version includes comprehensive debugging and error handling
+            </p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('braille')">📱 Braille Art</button>
+            <button class="tab-btn" onclick="showTab('emoji')">😀 Emoji Art</button>
+            <button class="tab-btn" onclick="showTab('ascii')">📝 ASCII Text</button>
+        </div>
+
+        <!-- Braille Art Tab -->
+        <div id="braille" class="tab-content active">
+            <div class="input-section">
+                <h2>Image to Braille Art</h2>
+                <div class="upload-area" id="braille-upload">
+                    <input type="file" id="braille-file" accept="image/*">
+                    <p>📤 Click to upload image or drag & drop</p>
+                </div>
+                
+                <div class="controls">
+                    <label>
+                        Columns: 
+                        <input type="range" id="braille-cols" min="20" max="80" value="40">
+                        <span id="braille-cols-val">40</span>
+                    </label>
+                    
+                    <label>
+                        Rows: 
+                        <input type="range" id="braille-rows" min="10" max="60" value="20">
+                        <span id="braille-rows-val">20</span>
+                    </label>
+                    
+                    <label>
+                        Threshold: 
+                        <input type="range" id="braille-threshold" min="0" max="255" value="127">
+                        <span id="braille-threshold-val">127</span>
+                    </label>
+                    
+                    <label>
+                        <input type="checkbox" id="braille-invert"> Invert (light on dark)
+                    </label>
+                </div>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <button onclick="generateBraille()" class="generate-btn" style="font-size: 16px; padding: 12px 24px;">
+                        🚀 Generate Braille Art
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simple placeholders for other tabs -->
+        <div id="emoji" class="tab-content">
+            <h2>Emoji Art Generator</h2>
+            <p>Focus on fixing braille first - check console for debug info!</p>
+        </div>
+
+        <div id="ascii" class="tab-content">
+            <h2>ASCII Text Generator</h2>
+            <p>Focus on fixing braille first - check console for debug info!</p>
+        </div>
+
+        <div class="output-section">
+            <h2>Output</h2>
+            <div class="output-controls">
+                <div class="output-toolbar">
+                    <button onclick="copyOutput()" class="copy-btn">📋 Copy</button>
+                    <button onclick="selectOutput()" class="select-btn">🔤 Select All</button>
+                    <button onclick="downloadOutput()" class="download-btn">💾 Download</button>
+                    <button onclick="toggleDebug()" class="debug-btn">🐛 Toggle Debug</button>
+                </div>
+            </div>
+            <pre id="output" class="output-area">Upload an image and click generate to see your art!
+
+💡 Enhanced version includes:
+- Comprehensive error handling
+- Detailed logging (check console)
+- Network request debugging
+- Response validation
+- Visual feedback improvements</pre>
+        </div>
+    </div>
+
+    <!-- Load original scripts -->
+    <script src="script.js"></script>
+    <!-- Load our enhanced braille function -->
+    <script src="robust-braille.js"></script>
+
+    <script>
+        // Enhanced tab functionality
+        function showTab(tabName) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Debug panel toggle
+        function toggleDebug() {
+            const debugPanel = document.getElementById('debug-info');
+            debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Enhanced range slider handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const rangeInputs = document.querySelectorAll('input[type="range"]');
+            rangeInputs.forEach(input => {
+                const valueSpan = document.getElementById(input.id + '-val');
+                if (valueSpan) {
+                    input.addEventListener('input', () => {
+                        valueSpan.textContent = input.value;
+                    });
+                }
+            });
+            
+            // Log page load
+            console.log('🎯 Enhanced BraillePixel page loaded!');
+            console.log('🌍 Location:', window.location.href);
+            
+            // Update debug panel periodically
+            setInterval(updateDebugPanel, 2000);
+        });
+
+        function updateDebugPanel() {
+            const debugPanel = document.getElementById('debug-info');
+            const now = new Date();
+            debugPanel.innerHTML = `
+                <strong>Debug Status</strong><br>
+                Time: ${now.toLocaleTimeString()}<br>
+                Location: ${window.location.hostname}<br>
+                Production: ${window.location.hostname.includes('netlify.app')}<br>
+                Output Element: ${document.getElementById('output') ? '✅' : '❌'}<br>
+                File Input: ${document.getElementById('braille-file') ? '✅' : '❌'}
+            `;
+        }
+
+        // Utility functions (simplified versions)
+        function copyOutput() {
+            const output = document.getElementById('output');
+            if (output) {
+                navigator.clipboard.writeText(output.textContent).then(() => {
+                    console.log('✅ Copied to clipboard');
+                }).catch(err => {
+                    console.error('❌ Copy failed:', err);
+                });
+            }
+        }
+
+        function selectOutput() {
+            const output = document.getElementById('output');
+            if (output) {
+                const range = document.createRange();
+                range.selectNode(output);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                console.log('✅ Output selected');
+            }
+        }
+
+        function downloadOutput() {
+            const output = document.getElementById('output');
+            if (output && output.textContent) {
+                const blob = new Blob([output.textContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'braille-art.txt';
+                a.click();
+                URL.revokeObjectURL(url);
+                console.log('✅ Download initiated');
+            }
+        }
+    </script>
+</body>
+</html>
