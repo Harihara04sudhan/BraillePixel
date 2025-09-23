@@ -5,15 +5,19 @@ function getApiEndpoint(endpoint) {
     const hostname = window.location.hostname;
     const isProduction = hostname.includes('netlify.app') || hostname.includes('netlify.com');
     
-    console.log('Hostname:', hostname, 'Production:', isProduction);
+    console.log('API Configuration - Hostname:', hostname, 'Production:', isProduction);
     
+    let apiUrl;
     if (isProduction) {
         // Production - use Netlify functions
-        return `/.netlify/functions/${endpoint}`;
+        apiUrl = `/.netlify/functions/${endpoint}`;
     } else {
         // Local development - use Flask routes (fallback routes handle both paths)
-        return `/api/${endpoint}`;
+        apiUrl = `/api/${endpoint}`;
     }
+    
+    console.log('Selected API URL:', apiUrl);
+    return apiUrl;
 }
 
 // Tab functionality
@@ -99,6 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Braille Art Generation (Real API calls)
 function generateBraille() {
+    console.log('Starting braille generation...');
+    
     const fileInput = document.getElementById('braille-file');
     const output = document.getElementById('output');
     
@@ -112,17 +118,25 @@ function generateBraille() {
     const threshold = document.getElementById('braille-threshold').value;
     const invert = document.getElementById('braille-invert').checked;
     
+    console.log('Parameters:', { cols, rows, threshold, invert });
+    
     output.textContent = 'Processing image...';
     
     // Read the file and convert to base64
     const file = fileInput.files[0];
+    console.log('Processing file:', file.name, 'Size:', file.size, 'Type:', file.type);
+    
     const reader = new FileReader();
     
     reader.onload = function(e) {
         const imageData = e.target.result;
+        console.log('Image data loaded, length:', imageData.length);
+        
+        const apiUrl = getApiEndpoint('braille');
+        console.log('Making request to:', apiUrl);
         
         // Call the backend API
-        fetch(getApiEndpoint('braille'), {
+        fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -135,16 +149,29 @@ function generateBraille() {
                 invert: invert
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Braille API Response Status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Braille API Response Data:', data);
             if (data.error) {
                 output.textContent = 'Error: ' + data.error;
+                if (data.stack) {
+                    console.error('Server Stack:', data.stack);
+                }
             } else {
                 output.textContent = data.result;
+                if (data.debug) {
+                    console.log('Debug Info:', data.debug);
+                }
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Braille Generation Error:', error);
             output.textContent = 'Error processing image: ' + error.message;
         });
     };
