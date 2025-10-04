@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BraillePixel - Function Test</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #667eea;
+        }
+        
+        .test-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .test-output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            margin: 5px 0;
+        }
+        
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #86efac;
+        }
+        
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 BraillePixel Function Tests</h1>
+        
+        <!-- Text to Emoji Test -->
+        <div class="test-section">
+            <h2 class="test-title">📝 Text to Emoji Test</h2>
+            <p>Test the text-to-emoji function with "HI":</p>
+            <button class="test-button" onclick="testTextToEmoji()">Test "HI" Pattern</button>
+            <div id="emoji-test-output" class="test-output">Click button to test...</div>
+            <div id="emoji-test-status" class="status info">Ready to test</div>
+        </div>
+        
+        <!-- Copy Function Test -->
+        <div class="test-section">
+            <h2 class="test-title">📋 Copy Function Test</h2>
+            <p>Test the copy functionality:</p>
+            <button class="test-button" onclick="testCopyFunction()">Test Copy Function</button>
+            <div id="copy-test-output" class="test-output">Sample text to copy: Hello World! 🌍</div>
+            <div id="copy-test-status" class="status info">Ready to test</div>
+        </div>
+        
+        <!-- Select Function Test -->
+        <div class="test-section">
+            <h2 class="test-title">🔤 Select Function Test</h2>
+            <p>Test the text selection functionality:</p>
+            <button class="test-button" onclick="testSelectFunction()">Test Select Function</button>
+            <div id="select-test-output" class="test-output">This text should be selected when you click the button above.</div>
+            <div id="select-test-status" class="status info">Ready to test</div>
+        </div>
+        
+        <!-- Download Function Test -->
+        <div class="test-section">
+            <h2 class="test-title">💾 Download Function Test</h2>
+            <p>Test the download functionality:</p>
+            <button class="test-button" onclick="testDownloadFunction()">Test Download Function</button>
+            <div id="download-test-output" class="test-output">This content will be downloaded as a text file.</div>
+            <div id="download-test-status" class="status info">Ready to test</div>
+        </div>
+        
+        <!-- Main App Navigation -->
+        <div class="test-section">
+            <h2 class="test-title">🔗 Navigation Links</h2>
+            <p>Quick access to main application:</p>
+            <button class="test-button" onclick="window.open('index.html', '_blank')">Open Modern Version</button>
+            <button class="test-button" onclick="window.open('index-original.html', '_blank')">Open Original Version</button>
+            <button class="test-button" onclick="window.open('design-comparison.html', '_blank')">Compare Designs</button>
+        </div>
+    </div>
+
+    <!-- Include the main scripts -->
+    <script src="script-simple.js"></script>
+    <script src="modern-enhancements.js"></script>
+    
+    <script>
+        // Test functions
+        function testTextToEmoji() {
+            const output = document.getElementById('emoji-test-output');
+            const status = document.getElementById('emoji-test-status');
+            
+            try {
+                // Test the generateTextToEmoji function
+                const result = generateTextToEmoji('HI', '🔥', '⚪');
+                output.textContent = result;
+                status.textContent = '✅ Text-to-emoji function working correctly!';
+                status.className = 'status success';
+                
+                console.log('HI pattern test result:', result);
+            } catch (error) {
+                output.textContent = 'Error: ' + error.message;
+                status.textContent = '❌ Text-to-emoji function failed: ' + error.message;
+                status.className = 'status error';
+                console.error('HI pattern test error:', error);
+            }
+        }
+        
+        function testCopyFunction() {
+            const output = document.getElementById('copy-test-output');
+            const status = document.getElementById('copy-test-status');
+            
+            // Temporarily set the output as the target for copy
+            const originalOutput = document.getElementById('output');
+            const tempOutput = document.createElement('pre');
+            tempOutput.id = 'output';
+            tempOutput.textContent = output.textContent;
+            tempOutput.style.display = 'none';
+            document.body.appendChild(tempOutput);
+            
+            try {
+                copyOutput();
+                status.textContent = '✅ Copy function executed (check console for details)';
+                status.className = 'status success';
+            } catch (error) {
+                status.textContent = '❌ Copy function failed: ' + error.message;
+                status.className = 'status error';
+                console.error('Copy test error:', error);
+            } finally {
+                // Restore original output element
+                document.body.removeChild(tempOutput);
+            }
+        }
+        
+        function testSelectFunction() {
+            const output = document.getElementById('select-test-output');
+            const status = document.getElementById('select-test-status');
+            
+            try {
+                // Test selection
+                if (window.getSelection) {
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(output);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    
+                    status.textContent = '✅ Text selection working! Text should be highlighted.';
+                    status.className = 'status success';
+                } else {
+                    status.textContent = '⚠️ Selection API not supported in this browser';
+                    status.className = 'status error';
+                }
+            } catch (error) {
+                status.textContent = '❌ Selection function failed: ' + error.message;
+                status.className = 'status error';
+                console.error('Selection test error:', error);
+            }
+        }
+        
+        function testDownloadFunction() {
+            const output = document.getElementById('download-test-output');
+            const status = document.getElementById('download-test-status');
+            
+            // Temporarily set the output as the target for download
+            const originalOutput = document.getElementById('output');
+            const tempOutput = document.createElement('pre');
+            tempOutput.id = 'output';
+            tempOutput.textContent = output.textContent;
+            tempOutput.style.display = 'none';
+            document.body.appendChild(tempOutput);
+            
+            try {
+                downloadOutput();
+                status.textContent = '✅ Download function executed (check your downloads folder)';
+                status.className = 'status success';
+            } catch (error) {
+                status.textContent = '❌ Download function failed: ' + error.message;
+                status.className = 'status error';
+                console.error('Download test error:', error);
+            } finally {
+                // Restore original output element
+                document.body.removeChild(tempOutput);
+            }
+        }
+        
+        // Auto-run text to emoji test when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Test page loaded');
+            
+            // Wait a moment for all scripts to load
+            setTimeout(() => {
+                testTextToEmoji();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

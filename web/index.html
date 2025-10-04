@@ -3,132 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BraillePixel - Text Art Generator</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>BraillePixel - Professional Text Art Generator</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles-modern.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3125411696052604"
          crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎨 BraillePixel Art Generator</h1>
-            <p>Convert images and text to various ASCII/Unicode art formats</p>
+    <!-- Background Elements -->
+    <div class="bg-gradient"></div>
+    <div class="bg-pattern"></div>
+    
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <div class="logo-container">
+                        <img src="pictologo.png" alt="BraillePixel Logo" class="brand-logo">
+                        <div class="logo-glow"></div>
+                    </div>
+                    <div class="brand-text">
+                        <h1 class="brand-title">BraillePixel</h1>
+                        <p class="brand-subtitle">Professional Text Art Generator</p>
+                    </div>
+                </div>
+                <p class="header-description">Transform images and text into beautiful ASCII, Braille, and Emoji art with professional quality output</p>
+            </div>
         </header>
 
-        <!-- Ad Space -->
-        <div style="text-align: center; margin: 20px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-3125411696052604"
-                 data-ad-slot="auto"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
-        </div>
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="braille" onclick="showTab('braille')">
+                <div class="tab-icon">⚫</div>
+                <span class="tab-label">Braille Art</span>
+                <div class="tab-description">Image to Braille patterns</div>
+            </button>
+            <button class="nav-tab" data-tab="emoji" onclick="showTab('emoji')">
+                <div class="tab-icon">😀</div>
+                <span class="tab-label">Emoji Art</span>
+                <div class="tab-description">Image & Text to Emojis</div>
+            </button>
+            <button class="nav-tab" data-tab="ascii" onclick="showTab('ascii')">
+                <div class="tab-icon">📝</div>
+                <span class="tab-label">ASCII Text</span>
+                <div class="tab-description">Text to ASCII art</div>
+            </button>
+        </nav>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('braille')">📱 Braille Art</button>
-            <button class="tab-btn" onclick="showTab('emoji')">😀 Emoji Art</button>
-            <button class="tab-btn" onclick="showTab('ascii')">📝 ASCII Text</button>
-        </div>
-
-        <!-- Braille Art Tab -->
-        <div id="braille" class="tab-content active">
-            <div class="input-section">
-                <h2>Image to Braille Art</h2>
-                <div class="upload-area" id="braille-upload">
-                    <input type="file" id="braille-file" accept="image/*">
-                    <p>📤 Click to upload image or drag & drop</p>
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Braille Art Tab -->
+            <section id="braille" class="content-panel active">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="panel-icon">⚫</span>
+                        Braille Art Generator
+                    </h2>
+                    <p class="panel-description">Convert images to Unicode Braille patterns for terminal and text displays</p>
                 </div>
                 
-                <div class="controls">
-                    <label>
-                        Columns: 
-                        <input type="range" id="braille-cols" min="20" max="120" value="80">
-                        <span id="braille-cols-val">80</span>
-                    </label>
+                <div class="input-grid">
+                    <div class="input-section">
+                        <h3 class="section-title">Upload Image</h3>
+                        <div class="upload-zone" id="braille-upload">
+                            <input type="file" id="braille-file" accept="image/*" class="file-input">
+                            <div class="upload-content">
+                                <div class="upload-icon">📸</div>
+                                <p class="upload-text">Click to select or drag & drop image</p>
+                                <p class="upload-hint">Supports PNG, JPG, GIF, WebP</p>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <label>
-                        Rows: 
-                        <input type="range" id="braille-rows" min="10" max="60" value="30">
-                        <span id="braille-rows-val">30</span>
-                    </label>
-                    
-                    <label>
-                        Threshold: 
-                        <input type="range" id="braille-threshold" min="0" max="255" value="127">
-                        <span id="braille-threshold-val">127</span>
-                    </label>
-                    
-                    <label>
-                        <input type="checkbox" id="braille-invert"> Invert (light on dark)
-                    </label>
+                    <div class="settings-section">
+                        <h3 class="section-title">Settings</h3>
+                        <div class="settings-grid">
+                            <div class="setting-item">
+                                <label class="setting-label">
+                                    <span class="label-text">Width</span>
+                                    <span class="label-value" id="braille-cols-val">80</span>
+                                </label>
+                                <input type="range" id="braille-cols" min="20" max="120" value="80" class="range-input">
+                                <div class="range-track"></div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <label class="setting-label">
+                                    <span class="label-text">Height</span>
+                                    <span class="label-value" id="braille-rows-val">30</span>
+                                </label>
+                                <input type="range" id="braille-rows" min="10" max="60" value="30" class="range-input">
+                                <div class="range-track"></div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <label class="setting-label">
+                                    <span class="label-text">Threshold</span>
+                                    <span class="label-value" id="braille-threshold-val">127</span>
+                                </label>
+                                <input type="range" id="braille-threshold" min="0" max="255" value="127" class="range-input">
+                                <div class="range-track"></div>
+                            </div>
+                            
+                            <div class="setting-item checkbox-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="braille-invert" class="checkbox-input">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Invert Colors</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button onclick="generateBraille()" class="generate-button">
+                            <span class="button-icon">⚡</span>
+                            Generate Braille Art
+                        </button>
+                    </div>
                 </div>
-                
-                <button onclick="generateBraille()" class="generate-btn">Generate Braille Art</button>
-            </div>
-        </div>
+            </section>
 
-        <!-- Emoji Art Tab -->
-        <div id="emoji" class="tab-content">
-            <div class="input-section emoji-section">
-                <h2>🎨 Emoji Art Generator</h2>
+            <!-- Emoji Art Tab -->
+            <section id="emoji" class="content-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="panel-icon">😀</span>
+                        Emoji Art Generator
+                    </h2>
+                    <p class="panel-description">Create vibrant emoji art from images or convert text to emoji patterns</p>
+                </div>
                 
                 <!-- Input Source Selection -->
-                <div class="input-mode-section">
-                    <h3>📋 Choose Input Source</h3>
-                    <div class="mode-selector">
-                        <label>
-                            <input type="radio" name="emoji-mode" value="image" checked>
-                            <span>📸 Image to Emoji</span>
+                <div class="mode-selector">
+                    <h3 class="section-title">Input Source</h3>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="emoji-mode" value="image" checked class="radio-input">
+                            <span class="radio-custom"></span>
+                            <div class="radio-content">
+                                <span class="radio-title">📸 Image to Emoji</span>
+                                <span class="radio-description">Convert photos to emoji art</span>
+                            </div>
                         </label>
-                        <label>
-                            <input type="radio" name="emoji-mode" value="text">
-                            <span>✏️ Text to Emoji</span>
-                        </label>
-                    </div>
-                    
-                    <div id="emoji-image-input">
-                        <div class="upload-area" id="emoji-upload">
-                            <input type="file" id="emoji-file" accept="image/*">
-                            <p>📤 Upload image for emoji conversion</p>
-                        </div>
-                    </div>
-                    
-                    <div id="emoji-text-input" style="display: none;">
-                        <div class="text-input-container">
-                            <h4>✏️ Enter Text to Convert</h4>
-                            <input type="text" id="emoji-text" placeholder="Enter your text (e.g., HELLO, LOVE, TVK)" class="large-text-input">
-                            <p class="input-help">💡 Best results with short text (1-10 characters). Try: names, words, initials!</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Render Mode Selection -->
-                <div class="render-mode-section">
-                    <h3>🎯 Choose Render Style</h3>
-                    <div class="mode-toggle">
-                        <label>
-                            <input type="radio" name="emoji-render-mode" value="gradient" checked>
-                            <span>🌈 Gradient Mode</span>
-                        </label>
-                        <label>
-                            <input type="radio" name="emoji-render-mode" value="binary">
-                            <span>⚫⚪ Binary Mode</span>
+                        <label class="radio-option">
+                            <input type="radio" name="emoji-mode" value="text" class="radio-input">
+                            <span class="radio-custom"></span>
+                            <div class="radio-content">
+                                <span class="radio-title">✏️ Text to Emoji</span>
+                                <span class="radio-description">Convert text to emoji patterns</span>
+                            </div>
                         </label>
                     </div>
                 </div>
                 
-                <!-- Emoji Controls -->
-                <div class="emoji-controls-section">
-                    <h3>⚙️ Emoji Settings</h3>
+                <!-- Dynamic Input Section -->
+                <div class="input-grid">
+                    <div class="input-section">
+                        <div id="emoji-image-input">
+                            <h3 class="section-title">Upload Image</h3>
+                            <div class="upload-zone" id="emoji-upload">
+                                <input type="file" id="emoji-file" accept="image/*" class="file-input">
+                                <div class="upload-content">
+                                    <div class="upload-icon">🖼️</div>
+                                    <p class="upload-text">Select image for emoji conversion</p>
+                                    <p class="upload-hint">Best results with high contrast images</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="emoji-text-input" style="display: none;">
+                            <h3 class="section-title">Enter Text</h3>
+                            <div class="text-input-container">
+                                <input type="text" id="emoji-text" placeholder="HELLO" class="text-input">
+                                <p class="input-hint">Best with short text (1-10 characters)</p>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <div id="gradient-controls">
-                        <div class="emoji-input-row">
-                            <label>
-                                <span>Emoji Set:</span>
-                                <select id="emoji-set">
+                    <div class="settings-section">
+                        <h3 class="section-title">Rendering Mode</h3>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="emoji-render-mode" value="gradient" checked class="radio-input">
+                                <span class="radio-custom"></span>
+                                <div class="radio-content">
+                                    <span class="radio-title">🌈 Gradient Mode</span>
+                                    <span class="radio-description">Smooth color transitions</span>
+                                </div>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="emoji-render-mode" value="binary" class="radio-input">
+                                <span class="radio-custom"></span>
+                                <div class="radio-content">
+                                    <span class="radio-title">⚫⚪ Binary Mode</span>
+                                    <span class="radio-description">Two-color contrast</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <!-- Gradient Controls -->
+                        <div id="gradient-controls" class="controls-section">
+                            <div class="setting-item">
+                                <label class="setting-label">
+                                    <span class="label-text">Emoji Set</span>
+                                </label>
+                                <select id="emoji-set" class="select-input">
                                     <option value="geometric" selected>🔸 Geometric</option>
                                     <option value="faces">😀 Faces</option>
                                     <option value="hearts">💖 Hearts</option>
@@ -137,134 +221,178 @@
                                     <option value="food">🍕 Food</option>
                                     <option value="custom">✨ Custom</option>
                                 </select>
-                            </label>
-                        </div>
-                        
-                        <div id="custom-emoji-input" style="display: none;">
-                            <label>
-                                <span>Custom Emojis (light to dark):</span>
-                                <input type="text" id="custom-emoji" placeholder="🔥,⭐,✨,💫,🌟">
-                                <small style="color: #718096; font-size: 0.9em;">Separate emojis with commas</small>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div id="binary-controls" style="display: none;">
-                        <div class="emoji-input-row">
-                            <label>
-                                <span>"On" Emoji (foreground):</span>
-                                <input type="text" id="on-emoji" value="🔥" maxlength="5">
-                            </label>
+                            </div>
                             
-                            <label>
-                                <span>"Off" Emoji (background):</span>
-                                <input type="text" id="off-emoji" value="⚪" maxlength="5">
-                            </label>
+                            <div id="custom-emoji-input" style="display: none;" class="setting-item">
+                                <label class="setting-label">
+                                    <span class="label-text">Custom Emojis</span>
+                                </label>
+                                <input type="text" id="custom-emoji" placeholder="🔥,⭐,✨,💫,🌟" class="text-input">
+                                <p class="input-hint">Separate with commas (light to dark)</p>
+                            </div>
                         </div>
                         
-                        <div class="threshold-control">
-                            <label>Brightness Threshold:</label>
-                            <input type="range" id="emoji-threshold" min="0" max="255" value="128">
-                            <span id="emoji-threshold-val">128</span>
+                        <!-- Binary Controls -->
+                        <div id="binary-controls" class="controls-section" style="display: none;">
+                            <div class="setting-item">
+                                <label class="setting-label">
+                                    <span class="label-text">Foreground Emoji</span>
+                                </label>
+                                <input type="text" id="on-emoji" value="🔥" maxlength="5" class="text-input emoji-input">
+                            </div>
+                            
+                            <div class="setting-item">
+                                <label class="setting-label">
+                                    <span class="label-text">Background Emoji</span>
+                                </label>
+                                <input type="text" id="off-emoji" value="⚪" maxlength="5" class="text-input emoji-input">
+                            </div>
+                            
+                            <div class="setting-item">
+                                <label class="setting-label">
+                                    <span class="label-text">Threshold</span>
+                                    <span class="label-value" id="emoji-threshold-val">128</span>
+                                </label>
+                                <input type="range" id="emoji-threshold" min="0" max="255" value="128" class="range-input">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="width-control">
-                        <label>Output Width:</label>
-                        <input type="range" id="emoji-width" min="20" max="100" value="60">
-                        <span id="emoji-width-val">60</span>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span class="label-text">Output Width</span>
+                                <span class="label-value" id="emoji-width-val">60</span>
+                            </label>
+                            <input type="range" id="emoji-width" min="20" max="100" value="60" class="range-input">
+                        </div>
+                        
+                        <button onclick="generateEmoji()" class="generate-button">
+                            <span class="button-icon">🚀</span>
+                            Generate Emoji Art
+                        </button>
                     </div>
                 </div>
-                
-                <button onclick="generateEmoji()" class="generate-btn">🚀 Generate Emoji Art</button>
-            </div>
-        </div>
+            </section>
 
-        <!-- ASCII Text Tab -->
-        <div id="ascii" class="tab-content">
-            <div class="input-section ascii-section">
-                <h2>📝 ASCII Text Art Generator</h2>
-                
-                <!-- Text Input Section -->
-                <div class="ascii-text-section">
-                    <h3>✏️ Enter Your Text</h3>
-                    <div class="ascii-text-container">
-                        <input type="text" id="ascii-text" placeholder="Enter your text (e.g., HELLO, WORLD, CODE)" value="HELLO" class="ascii-text-input">
-                        <p class="input-help">💡 Works best with short text and uppercase letters!</p>
-                    </div>
+            <!-- ASCII Text Tab -->
+            <section id="ascii" class="content-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="panel-icon">📝</span>
+                        ASCII Text Art Generator
+                    </h2>
+                    <p class="panel-description">Transform text into classic ASCII art with multiple styles and effects</p>
                 </div>
                 
-                <!-- Style Settings Section -->
-                <div class="ascii-style-section">
-                    <h3>🎨 Style Settings</h3>
+                <div class="input-grid">
+                    <div class="input-section">
+                        <h3 class="section-title">Enter Text</h3>
+                        <div class="text-input-container">
+                            <input type="text" id="ascii-text" placeholder="HELLO" value="HELLO" class="text-input large-text">
+                            <p class="input-hint">Works best with uppercase letters and short text</p>
+                        </div>
+                    </div>
                     
-                    <div class="ascii-style-grid">
-                        <div class="style-control">
-                            <label>
-                                <span class="control-label">🔤 Font Style</span>
-                                <select id="ascii-font">
-                                    <option value="block">█ Block Style</option>
-                                    <option value="simple">▪ Simple Style</option>
-                                </select>
+                    <div class="settings-section">
+                        <h3 class="section-title">Style Settings</h3>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span class="label-text">Font Style</span>
                             </label>
+                            <select id="ascii-font" class="select-input">
+                                <option value="block">█ Block Style</option>
+                                <option value="simple">▪ Simple Style</option>
+                            </select>
                         </div>
                         
-                        <div class="style-control">
-                            <label>
-                                <span class="control-label">↔️ Character Spacing</span>
-                                <div class="range-control">
-                                    <input type="range" id="ascii-spacing" min="0" max="5" value="1">
-                                    <span class="range-value" id="ascii-spacing-val">1</span>
-                                </div>
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span class="label-text">Character Spacing</span>
+                                <span class="label-value" id="ascii-spacing-val">1</span>
                             </label>
+                            <input type="range" id="ascii-spacing" min="0" max="5" value="1" class="range-input">
                         </div>
-                    </div>
-                    
-                    <!-- Effect Options -->
-                    <div class="ascii-effects-section">
-                        <h4>✨ Special Effects</h4>
-                        <div class="effect-options">
-                            <label class="effect-option">
-                                <input type="checkbox" id="ascii-border">
-                                <span class="effect-label">🔲 Add Border Frame</span>
-                            </label>
-                            
-                            <label class="effect-option">
-                                <input type="checkbox" id="ascii-gradient">
-                                <span class="effect-label">🌈 Gradient Effect</span>
-                            </label>
+                        
+                        <div class="effects-section">
+                            <h4 class="effects-title">Special Effects</h4>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="ascii-border" class="checkbox-input">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Border Frame</span>
+                                </label>
+                                
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="ascii-gradient" class="checkbox-input">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Gradient Effect</span>
+                                </label>
+                            </div>
                         </div>
+                        
+                        <button onclick="generateASCII()" class="generate-button">
+                            <span class="button-icon">⚡</span>
+                            Generate ASCII Art
+                        </button>
                     </div>
                 </div>
-                
-                <button onclick="generateASCII()" class="generate-btn">🚀 Generate ASCII Art</button>
-            </div>
-        </div>
+            </section>
+        </main>
 
         <!-- Output Section -->
-        <div class="output-section">
+        <section class="output-section">
             <div class="output-header">
-                <h2>Output</h2>
-                <div class="output-buttons">
-                    <button onclick="copyOutput()" class="copy-btn">📋 Copy</button>
-                    <button onclick="selectOutput()" class="select-btn">🔤 Select All</button>
-                    <button onclick="downloadOutput()" class="download-btn">💾 Download</button>
+                <h2 class="output-title">Generated Art</h2>
+                <div class="output-actions">
+                    <button onclick="copyOutput()" class="action-button copy">
+                        <span class="button-icon">📋</span>
+                        <span class="button-text">Copy</span>
+                    </button>
+                    <button onclick="selectOutput()" class="action-button select">
+                        <span class="button-icon">🔤</span>
+                        <span class="button-text">Select All</span>
+                    </button>
+                    <button onclick="downloadOutput()" class="action-button download">
+                        <span class="button-icon">💾</span>
+                        <span class="button-text">Download</span>
+                    </button>
                 </div>
             </div>
-            <pre id="output" class="output-area">Your generated art will appear here...
+            <div class="output-container">
+                <pre id="output" class="output-display">Your generated art will appear here...
 
-💡 Tips:
-- Use 📋 Copy to copy to clipboard
-- Use 🔤 Select All then Ctrl+C if copy fails
-- Use 💾 Download to save as text file</pre>
-        </div>
+💡 Tips for best results:
+• Use high contrast images for Braille art
+• Try different emoji sets for varied effects  
+• Short text works best for ASCII art
+• Use Copy button for clipboard or Select All + Ctrl+C
+• Download saves your art as a text file</pre>
+            </div>
+        </section>
 
-        <footer>
-            <p>Made with ❤️ | <a href="https://github.com/Harihara04sudhan/BraillePixel" target="_blank">GitHub Repo</a></p>
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <p class="footer-text">
+                    Crafted with ❤️ by the BraillePixel team
+                </p>
+                <div class="footer-links">
+                    <a href="https://github.com/Harihara04sudhan/BraillePixel" target="_blank" class="footer-link">
+                        <span class="link-icon">🔗</span>
+                        GitHub Repository
+                    </a>
+                    <a href="debug-api.html" target="_blank" class="footer-link">
+                        <span class="link-icon">🔧</span>
+                        API Debug
+                    </a>
+                </div>
+            </div>
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Scripts -->
+    <script src="script-simple.js"></script>
+    <script src="modern-enhancements.js"></script>
     
     <!-- Initialize AdSense ads -->
     <script>
