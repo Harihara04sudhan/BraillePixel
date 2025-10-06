@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Debug - BraillePixel</title>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3125411696052604"
+         crossorigin="anonymous"></script>
+         
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-btn:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 BraillePixel API Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h2>Environment Info</h2>
+        <div id="env-info" class="result info">
+            <script>
+                document.getElementById('env-info').textContent = `
+Hostname: ${window.location.hostname}
+Protocol: ${window.location.protocol}
+Full URL: ${window.location.href}
+User Agent: ${navigator.userAgent}
+Current Time: ${new Date().toISOString()}
+                `.trim();
+            </script>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>API Endpoint Tests</h2>
+        <button class="test-btn" onclick="testBrailleAPI()">Test Braille API</button>
+        <button class="test-btn" onclick="testEmojiAPI()">Test Emoji API</button>
+        <button class="test-btn" onclick="testASCIIAPI()">Test ASCII API</button>
+        <button class="test-btn" onclick="testAllAPIs()">Test All APIs</button>
+        <div id="api-results"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>Network Connectivity</h2>
+        <button class="test-btn" onclick="testConnectivity()">Test Network</button>
+        <div id="network-results"></div>
+    </div>
+
+    <script>
+        // Import the API endpoint function from main script
+        function getApiEndpoint(endpoint) {
+            const hostname = window.location.hostname;
+            const isProduction = hostname.includes('netlify.app') || hostname.includes('netlify.com');
+            
+            console.log('API Configuration - Hostname:', hostname, 'Production:', isProduction);
+            
+            let apiUrl;
+            if (isProduction) {
+                apiUrl = `/.netlify/functions/${endpoint}`;
+            } else {
+                apiUrl = `/api/${endpoint}`;
+            }
+            
+            console.log('Selected API URL:', apiUrl);
+            return apiUrl;
+        }
+
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const result = document.createElement('div');
+            result.className = `result ${type}`;
+            result.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(result);
+        }
+
+        async function testBrailleAPI() {
+            const containerId = 'api-results';
+            addResult(containerId, 'Testing Braille API...', 'info');
+            
+            try {
+                const endpoint = getApiEndpoint('braille');
+                addResult(containerId, `Endpoint: ${endpoint}`, 'info');
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
+                        cols: 20,
+                        rows: 10,
+                        threshold: 127,
+                        invert: false
+                    })
+                });
+                
+                addResult(containerId, `Status: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+                
+                const data = await response.json();
+                addResult(containerId, `Response: ${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+                
+            } catch (error) {
+                addResult(containerId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testEmojiAPI() {
+            const containerId = 'api-results';
+            addResult(containerId, 'Testing Emoji API...', 'info');
+            
+            try {
+                const endpoint = getApiEndpoint('emoji');
+                addResult(containerId, `Endpoint: ${endpoint}`, 'info');
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mode: 'text',
+                        text: 'TEST',
+                        on_emoji: '🔥',
+                        off_emoji: '⚪',
+                        width: 20
+                    })
+                });
+                
+                addResult(containerId, `Status: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+                
+                const data = await response.json();
+                addResult(containerId, `Response: ${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+                
+            } catch (error) {
+                addResult(containerId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testASCIIAPI() {
+            const containerId = 'api-results';
+            addResult(containerId, 'Testing ASCII API...', 'info');
+            
+            try {
+                const endpoint = getApiEndpoint('ascii');
+                addResult(containerId, `Endpoint: ${endpoint}`, 'info');
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: 'TEST',
+                        font: 'block',
+                        border: false,
+                        gradient: false
+                    })
+                });
+                
+                addResult(containerId, `Status: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+                
+                const data = await response.json();
+                addResult(containerId, `Response: ${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+                
+            } catch (error) {
+                addResult(containerId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAllAPIs() {
+            document.getElementById('api-results').innerHTML = '';
+            await testBrailleAPI();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testEmojiAPI();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testASCIIAPI();
+        }
+
+        async function testConnectivity() {
+            const containerId = 'network-results';
+            document.getElementById(containerId).innerHTML = '';
+            
+            addResult(containerId, 'Testing network connectivity...', 'info');
+            
+            // Test basic connectivity
+            try {
+                const response = await fetch('/');
+                addResult(containerId, `Main site accessible: ${response.status}`, 'success');
+            } catch (error) {
+                addResult(containerId, `Main site error: ${error.message}`, 'error');
+            }
+            
+            // Test function endpoints
+            const endpoints = ['braille', 'emoji', 'ascii'];
+            for (const endpoint of endpoints) {
+                try {
+                    const url = getApiEndpoint(endpoint);
+                    const response = await fetch(url, { method: 'OPTIONS' });
+                    addResult(containerId, `${endpoint} endpoint accessible: ${response.status}`, response.ok ? 'success' : 'error');
+                } catch (error) {
+                    addResult(containerId, `${endpoint} endpoint error: ${error.message}`, 'error');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

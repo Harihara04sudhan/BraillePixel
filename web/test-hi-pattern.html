@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test HI Pattern</title>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3125411696052604"
+         crossorigin="anonymous"></script>
+         
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .pattern { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+        .emoji-line { font-size: 20px; line-height: 1.2; }
+    </style>
+</head>
+<body>
+    <h2>Testing "HI" Emoji Pattern</h2>
+    
+    <div class="pattern">
+        <h3>Expected Pattern for "H":</h3>
+        <div class="emoji-line">🔥⚪⚪⚪🔥</div>
+        <div class="emoji-line">🔥⚪⚪⚪🔥</div>
+        <div class="emoji-line">🔥🔥🔥🔥🔥</div>
+        <div class="emoji-line">🔥⚪⚪⚪🔥</div>
+        <div class="emoji-line">🔥⚪⚪⚪🔥</div>
+    </div>
+    
+    <div class="pattern">
+        <h3>Expected Pattern for "I":</h3>
+        <div class="emoji-line">⚪🔥🔥🔥⚪</div>
+        <div class="emoji-line">⚪⚪🔥⚪⚪</div>
+        <div class="emoji-line">⚪⚪🔥⚪⚪</div>
+        <div class="emoji-line">⚪⚪🔥⚪⚪</div>
+        <div class="emoji-line">⚪🔥🔥🔥⚪</div>
+    </div>
+    
+    <div class="pattern">
+        <h3>Expected Pattern for "HI" together:</h3>
+        <div class="emoji-line">🔥⚪⚪⚪🔥⚪⚪🔥🔥🔥⚪</div>
+        <div class="emoji-line">🔥⚪⚪⚪🔥⚪⚪⚪🔥⚪⚪</div>
+        <div class="emoji-line">🔥🔥🔥🔥🔥⚪⚪⚪🔥⚪⚪</div>
+        <div class="emoji-line">🔥⚪⚪⚪🔥⚪⚪⚪🔥⚪⚪</div>
+        <div class="emoji-line">🔥⚪⚪⚪🔥⚪⚪🔥🔥🔥⚪</div>
+    </div>
+    
+    <script>
+        // Test the patterns
+        const letterPatterns = {
+            'H': ['10001', '10001', '11111', '10001', '10001'],
+            'I': ['01110', '00100', '00100', '00100', '01110']
+        };
+        
+        console.log('H pattern:', letterPatterns.H);
+        console.log('I pattern:', letterPatterns.I);
+        
+        function generateTextToEmoji(text, onEmoji, offEmoji) {
+            let result = '';
+            
+            for (let row = 0; row < 5; row++) {
+                let line = '';
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    const pattern = letterPatterns[char];
+                    if (pattern) {
+                        const rowPattern = pattern[row];
+                        
+                        for (let j = 0; j < rowPattern.length; j++) {
+                            const bit = rowPattern[j];
+                            line += bit === '1' ? onEmoji : offEmoji;
+                        }
+                        
+                        if (i < text.length - 1) {
+                            line += offEmoji;
+                        }
+                    }
+                }
+                result += line + '\n';
+            }
+            
+            return result.trim();
+        }
+        
+        const hiPattern = generateTextToEmoji('HI', '🔥', '⚪');
+        console.log('Generated HI pattern:');
+        console.log(hiPattern);
+        
+        // Display in page
+        const div = document.createElement('div');
+        div.className = 'pattern';
+        div.innerHTML = '<h3>Generated "HI" Pattern:</h3><pre style="font-size: 16px; line-height: 1.2;">' + hiPattern + '</pre>';
+        document.body.appendChild(div);
+    </script>
+</body>
+</html>

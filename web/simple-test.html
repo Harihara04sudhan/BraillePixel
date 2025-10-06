@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Button Test</title>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3125411696052604"
+         crossorigin="anonymous"></script>
+         
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .test-area { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .result { margin: 10px 0; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Button Functionality Test</h1>
+    
+    <div class="test-area">
+        <h2>Tab Test</h2>
+        <button onclick="testShowTab('test1')">Test Tab 1</button>
+        <button onclick="testShowTab('test2')">Test Tab 2</button>
+        <div id="tab-result" class="result">Click a tab button...</div>
+    </div>
+    
+    <div class="test-area">
+        <h2>Generate Functions Test</h2>
+        <button onclick="testGenerateBraille()">Test Generate Braille</button>
+        <button onclick="testGenerateEmoji()">Test Generate Emoji</button>
+        <button onclick="testGenerateASCII()">Test Generate ASCII</button>
+        <div id="generate-result" class="result">Click a generate button...</div>
+    </div>
+    
+    <div class="test-area">
+        <h2>File Upload Test</h2>
+        <input type="file" id="test-file" accept="image/*">
+        <div id="file-result" class="result">Select a file...</div>
+    </div>
+
+    <script>
+        // Test functions
+        function testShowTab(tabName) {
+            console.log('testShowTab called with:', tabName);
+            document.getElementById('tab-result').textContent = `Tab function called with: ${tabName}`;
+        }
+        
+        function testGenerateBraille() {
+            console.log('testGenerateBraille called');
+            document.getElementById('generate-result').textContent = 'Generate Braille function called!';
+        }
+        
+        function testGenerateEmoji() {
+            console.log('testGenerateEmoji called');
+            document.getElementById('generate-result').textContent = 'Generate Emoji function called!';
+        }
+        
+        function testGenerateASCII() {
+            console.log('testGenerateASCII called');
+            document.getElementById('generate-result').textContent = 'Generate ASCII function called!';
+        }
+        
+        // Test file upload
+        document.getElementById('test-file').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                document.getElementById('file-result').textContent = `File selected: ${fileName}`;
+                console.log('File selected:', fileName);
+            }
+        });
+        
+        console.log('Simple test page loaded successfully!');
+    </script>
+</body>
+</html>
