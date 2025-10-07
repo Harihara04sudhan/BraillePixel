@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Mode Emoji Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        .test { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .result { 
+            background: #e9ecef; 
+            padding: 15px; 
+            margin: 10px 0; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            line-height: 1.3;
+        }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .emoji-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .emoji-test { border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+        h4 { margin-top: 0; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Binary Mode Emoji Collapse Fix Test</h1>
+    <p>Testing that binary mode emojis no longer collapse when using different emoji combinations.</p>
+    
+    <div class="test">
+        <h3>🔥 Quick Test - "HI" with Different Emojis</h3>
+        <button onclick="testHiWithDifferentEmojis()">Test "HI" Variations</button>
+        <div class="emoji-grid" id="hi-variations"></div>
+    </div>
+    
+    <div class="test">
+        <h3>🎯 Specific Collapse-Prone Combinations</h3>
+        <button onclick="testCollapseProne()">Test Collapse-Prone Emojis</button>
+        <div id="collapse-results" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>📏 Width Comparison</h3>
+        <p>These should all have consistent spacing despite different emoji widths:</p>
+        <button onclick="testWidthConsistency()">Test Width Consistency</button>
+        <div id="width-results" class="result"></div>
+    </div>
+    
+    <script src="script-simple.js"></script>
+    <script>
+        function testHiWithDifferentEmojis() {
+            const emojiCombos = [
+                { on: '🔥', off: '⚪', name: 'Fire & White Circle' },
+                { on: '❤️', off: '🤍', name: 'Red & White Heart' },
+                { on: '✅', off: '❌', name: 'Check & Cross' },
+                { on: '🌟', off: '🌑', name: 'Star & New Moon' },
+                { on: '🔴', off: '⚫', name: 'Red & Black Circle' },
+                { on: '🟢', off: '🟡', name: 'Green & Yellow Circle' }
+            ];
+            
+            const container = document.getElementById('hi-variations');
+            container.innerHTML = '';
+            
+            emojiCombos.forEach(combo => {
+                try {
+                    const result = generateTextToEmoji('HI', combo.on, combo.off);
+                    
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'emoji-test';
+                    testDiv.innerHTML = `
+                        <h4>${combo.name}</h4>
+                        <div class="result">${result}</div>
+                    `;
+                    container.appendChild(testDiv);
+                } catch (error) {
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'emoji-test';
+                    testDiv.innerHTML = `
+                        <h4>${combo.name}</h4>
+                        <div class="result">ERROR: ${error.message}</div>
+                    `;
+                    container.appendChild(testDiv);
+                }
+            });
+        }
+        
+        function testCollapseProne() {
+            // These combinations are known to cause collapse issues
+            const problematicCombos = [
+                { text: 'AB', on: '👨', off: '👩', name: 'People emojis' },
+                { text: 'XY', on: '🏳️‍🌈', off: '🏁', name: 'Flag emojis' },
+                { text: 'OK', on: '🔥', off: '💧', name: 'Fire & water' },
+                { text: 'NO', on: '🚀', off: '🛑', name: 'Rocket & stop sign' },
+                { text: 'GO', on: '⭐', off: '🌟', name: 'Different star types' }
+            ];
+            
+            let results = 'Testing collapse-prone emoji combinations:\\n\\n';
+            
+            problematicCombos.forEach(combo => {
+                try {
+                    const result = generateTextToEmoji(combo.text, combo.on, combo.off);
+                    results += `--- ${combo.text} (${combo.name}) ---\\n`;
+                    results += `On: ${combo.on} | Off: ${combo.off}\\n`;
+                    results += `${result}\\n\\n`;
+                } catch (error) {
+                    results += `--- ${combo.text} ERROR: ${error.message} ---\\n\\n`;
+                }
+            });
+            
+            document.getElementById('collapse-results').textContent = results;
+        }
+        
+        function testWidthConsistency() {
+            // Test that different width emojis maintain consistent spacing
+            const widthTests = [
+                { on: '█', off: ' ', name: 'Block characters (narrow)' },
+                { on: '🔥', off: '⚪', name: 'Standard emojis' },
+                { on: '👨‍💻', off: '👩‍💻', name: 'Complex emojis (wide)' },
+                { on: '🏳️‍🌈', off: '🏳️‍⚧️', name: 'Flag emojis (very wide)' }
+            ];
+            
+            let results = 'Width consistency test for "AB":\\n\\n';
+            
+            widthTests.forEach(test => {
+                try {
+                    const result = generateTextToEmoji('AB', test.on, test.off);
+                    results += `--- ${test.name} ---\\n${result}\\n\\n`;
+                } catch (error) {
+                    results += `--- ${test.name} ERROR: ${error.message} ---\\n\\n`;
+                }
+            });
+            
+            document.getElementById('width-results').textContent = results;
+        }
+        
+        // Auto-run tests when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (typeof generateTextToEmoji === 'function') {
+                    console.log('✅ generateTextToEmoji function loaded');
+                    testHiWithDifferentEmojis();
+                } else {
+                    console.error('❌ generateTextToEmoji function not found');
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

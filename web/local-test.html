@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BraillePixel Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🧪 BraillePixel Local Test</h1>
+    
+    <div class="test-section">
+        <h2>Basic Functionality Test</h2>
+        <button onclick="testBasicHTML()">Test HTML Structure</button>
+        <button onclick="testCSS()">Test CSS Loading</button>
+        <button onclick="testJS()">Test JavaScript</button>
+        <button onclick="testLogo()">Test Logo</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>File Test</h2>
+        <input type="file" id="test-file" accept="image/*">
+        <div id="file-result"></div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'success') {
+            const container = document.getElementById('test-results');
+            const result = document.createElement('div');
+            result.className = `result ${type}`;
+            result.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(result);
+        }
+
+        function testBasicHTML() {
+            addResult('Testing HTML structure...', 'success');
+            
+            // Test if main elements exist
+            const tests = [
+                { name: 'Logo image', selector: 'img[src="pictologo.png"]' },
+                { name: 'Tab buttons', selector: '.tab-btn' },
+                { name: 'Upload areas', selector: '.upload-area' },
+                { name: 'Output area', selector: '#output' },
+                { name: 'File inputs', selector: 'input[type="file"]' }
+            ];
+            
+            tests.forEach(test => {
+                const element = document.querySelector(test.selector);
+                if (element) {
+                    addResult(`✅ ${test.name} found`, 'success');
+                } else {
+                    addResult(`❌ ${test.name} missing`, 'error');
+                }
+            });
+        }
+
+        function testCSS() {
+            addResult('Testing CSS loading...', 'success');
+            
+            // Check if styles are applied
+            const body = getComputedStyle(document.body);
+            const hasBackground = body.background.includes('gradient') || body.backgroundColor !== 'rgba(0, 0, 0, 0)';
+            
+            if (hasBackground) {
+                addResult('✅ CSS loaded successfully', 'success');
+            } else {
+                addResult('❌ CSS not loaded properly', 'error');
+            }
+        }
+
+        function testJS() {
+            addResult('Testing JavaScript...', 'success');
+            
+            // Test if main functions exist
+            const functions = ['showTab', 'generateBraille', 'generateEmoji', 'generateASCII'];
+            
+            functions.forEach(func => {
+                if (typeof window[func] === 'function') {
+                    addResult(`✅ Function ${func} exists`, 'success');
+                } else {
+                    addResult(`❌ Function ${func} missing`, 'error');
+                }
+            });
+        }
+
+        function testLogo() {
+            addResult('Testing logo...', 'success');
+            
+            const logo = document.querySelector('img[src="pictologo.png"]');
+            if (logo) {
+                logo.onload = () => addResult('✅ Logo loaded successfully', 'success');
+                logo.onerror = () => addResult('❌ Logo failed to load', 'error');
+                
+                // If already loaded
+                if (logo.complete) {
+                    if (logo.naturalWidth > 0) {
+                        addResult('✅ Logo already loaded', 'success');
+                    } else {
+                        addResult('❌ Logo exists but failed to load', 'error');
+                    }
+                }
+            } else {
+                addResult('❌ Logo element not found', 'error');
+            }
+        }
+
+        // Test file input
+        document.getElementById('test-file').addEventListener('change', function(e) {
+            const fileResult = document.getElementById('file-result');
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileResult.innerHTML = `
+                    <div class="result success">
+                        ✅ File selected: ${file.name}<br>
+                        Size: ${(file.size / 1024).toFixed(2)} KB<br>
+                        Type: ${file.type}
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

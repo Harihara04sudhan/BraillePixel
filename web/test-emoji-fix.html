@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Emoji Text Fix</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        .test { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .result { background: #e9ecef; padding: 15px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Emoji Text Generation Test</h1>
+    
+    <div class="test">
+        <h3>Test Custom Emoji Text Generation</h3>
+        <label>Text: <input type="text" id="test-text" value="HI" placeholder="Enter text"></label><br>
+        <label>On Emoji: <input type="text" id="test-on" value="🔥" placeholder="Foreground emoji"></label><br>
+        <label>Off Emoji: <input type="text" id="test-off" value="⚪" placeholder="Background emoji"></label><br>
+        <button onclick="testGeneration()">Generate Test</button>
+        <div id="test-result" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test Different Emojis</h3>
+        <button onclick="testWithDifferentEmojis()">Test Various Emoji Combinations</button>
+        <div id="variation-result" class="result"></div>
+    </div>
+    
+    <script src="script-simple.js"></script>
+    <script>
+        function testGeneration() {
+            const text = document.getElementById('test-text').value.toUpperCase();
+            const onEmoji = document.getElementById('test-on').value || '🔥';
+            const offEmoji = document.getElementById('test-off').value || '⚪';
+            
+            try {
+                if (typeof generateTextToEmoji === 'function') {
+                    const result = generateTextToEmoji(text, onEmoji, offEmoji);
+                    document.getElementById('test-result').textContent = 
+                        `Text: "${text}"\nOn: ${onEmoji}, Off: ${offEmoji}\n\nResult:\n${result}`;
+                } else {
+                    document.getElementById('test-result').textContent = 'ERROR: generateTextToEmoji function not found';
+                }
+            } catch (error) {
+                document.getElementById('test-result').textContent = 'ERROR: ' + error.message;
+            }
+        }
+        
+        function testWithDifferentEmojis() {
+            const tests = [
+                { text: 'HI', on: '🔥', off: '⚪' },
+                { text: 'LOVE', on: '❤️', off: '🤍' },
+                { text: 'OK', on: '✅', off: '❌' },
+                { text: 'A', on: '🌟', off: '🌑' }
+            ];
+            
+            let results = '';
+            tests.forEach(test => {
+                try {
+                    const result = generateTextToEmoji(test.text, test.on, test.off);
+                    results += `--- ${test.text} (${test.on}/${test.off}) ---\n${result}\n\n`;
+                } catch (error) {
+                    results += `--- ${test.text} ERROR: ${error.message} ---\n\n`;
+                }
+            });
+            
+            document.getElementById('variation-result').textContent = results;
+        }
+        
+        // Auto-test when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(testGeneration, 500);
+        });
+    </script>
+</body>
+</html>

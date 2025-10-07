@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BraillePixel Manual Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        .test { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .result { background: #e9ecef; padding: 15px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🧪 BraillePixel Manual Test</h1>
+    <p>Quick manual tests to verify core functionality works.</p>
+    
+    <div class="test">
+        <h3>📝 ASCII Text Test</h3>
+        <button onclick="testASCII()">Generate ASCII for "HELLO"</button>
+        <div id="ascii-result" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>😀 Emoji Text Test</h3>
+        <button onclick="testEmoji()">Generate Emoji for "HI"</button>
+        <div id="emoji-result" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>🔧 Function Availability Test</h3>
+        <button onclick="testFunctions()">Check All Functions</button>
+        <div id="function-result" class="result"></div>
+    </div>
+    
+    <script src="script-simple.js"></script>
+    <script>
+        function testASCII() {
+            const result = document.getElementById('ascii-result');
+            try {
+                if (typeof generateASCIIText === 'function') {
+                    const output = generateASCIIText('HELLO', 'block', true, false);
+                    result.textContent = 'ASCII Result for "HELLO":\n\n' + output;
+                } else {
+                    result.textContent = 'ERROR: generateASCIIText function not found';
+                }
+            } catch (error) {
+                result.textContent = 'ERROR: ' + error.message;
+            }
+        }
+        
+        function testEmoji() {
+            const result = document.getElementById('emoji-result');
+            try {
+                if (typeof generateTextToEmoji === 'function') {
+                    const output = generateTextToEmoji('HI', '🔥', '⚪');
+                    result.textContent = 'Emoji Result for "HI":\n\n' + output;
+                } else {
+                    result.textContent = 'ERROR: generateTextToEmoji function not found';
+                }
+            } catch (error) {
+                result.textContent = 'ERROR: ' + error.message;
+            }
+        }
+        
+        function testFunctions() {
+            const result = document.getElementById('function-result');
+            const functions = [
+                'showTab',
+                'generateBraille', 
+                'generateEmoji',
+                'generateASCII',
+                'processImageToBraille',
+                'processImageToEmojiBinary',
+                'processImageToEmojiGradient',
+                'generateTextToEmoji',
+                'generateASCIIText',
+                'copyOutput',
+                'selectOutput',
+                'downloadOutput'
+            ];
+            
+            let report = 'Function Availability Report:\n\n';
+            let available = 0;
+            
+            functions.forEach(func => {
+                const exists = typeof window[func] === 'function';
+                report += `${exists ? '✅' : '❌'} ${func}: ${exists ? 'Available' : 'Missing'}\n`;
+                if (exists) available++;
+            });
+            
+            report += `\nSummary: ${available}/${functions.length} functions available\n`;
+            
+            if (available === functions.length) {
+                report += '\n🎉 ALL FUNCTIONS READY FOR DEPLOYMENT!';
+            } else {
+                report += '\n⚠️ Some functions are missing - check console for details';
+            }
+            
+            result.textContent = report;
+        }
+        
+        // Auto-run function test when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(testFunctions, 500);
+        });
+    </script>
+</body>
+</html>

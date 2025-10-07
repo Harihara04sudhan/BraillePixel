@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproduce Main App Emoji Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        .section { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .result { background: #e9ecef; padding: 15px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        input[type="radio"] { margin: 10px 5px; }
+        input[type="text"] { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        label { display: block; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Reproduce Main App Emoji Test</h1>
+    
+    <!-- Simulate the exact HTML structure from main app -->
+    <div class="section">
+        <h3>Input Mode Selection</h3>
+        <label>
+            <input type="radio" name="emoji-mode" value="image">
+            📸 Image to Emoji
+        </label>
+        <label>
+            <input type="radio" name="emoji-mode" value="text" checked>
+            ✏️ Text to Emoji
+        </label>
+        
+        <div id="emoji-text-input">
+            <label>Text Input:
+                <input type="text" id="emoji-text" value="HI" placeholder="Enter text">
+            </label>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h3>Render Mode Selection</h3>
+        <label>
+            <input type="radio" name="emoji-render-mode" value="gradient">
+            🌈 Gradient Mode
+        </label>
+        <label>
+            <input type="radio" name="emoji-render-mode" value="binary" checked>
+            ⚫⚪ Binary Mode
+        </label>
+        
+        <div id="binary-controls">
+            <label>"On" Emoji:
+                <input type="text" id="on-emoji" value="🔥">
+            </label>
+            <label>"Off" Emoji:
+                <input type="text" id="off-emoji" value="⚪">
+            </label>
+        </div>
+    </div>
+    
+    <div class="section">
+        <button onclick="testGenerateEmoji()">🚀 Test Generate Emoji</button>
+        <div id="test-status" class="result">Ready to test...</div>
+    </div>
+    
+    <div class="section">
+        <h3>Output</h3>
+        <pre id="output" class="result">Output will appear here...</pre>
+    </div>
+    
+    <script src="script-simple.js"></script>
+    <script>
+        function testGenerateEmoji() {
+            const status = document.getElementById('test-status');
+            
+            try {
+                status.textContent = 'Testing generateEmoji function...\\n';
+                
+                // Check if the function exists
+                if (typeof generateEmoji !== 'function') {
+                    throw new Error('generateEmoji function not found');
+                }
+                
+                // Check elements exist
+                const output = document.getElementById('output');
+                const mode = document.querySelector('input[name="emoji-mode"]:checked');
+                const textInput = document.getElementById('emoji-text');
+                const renderMode = document.querySelector('input[name="emoji-render-mode"]:checked');
+                const onInput = document.getElementById('on-emoji');
+                const offInput = document.getElementById('off-emoji');
+                
+                status.textContent += `Output element: ${output ? '✅' : '❌'}\\n`;
+                status.textContent += `Mode selected: ${mode ? mode.value : '❌ None'}\\n`;
+                status.textContent += `Text input: ${textInput ? textInput.value : '❌ Not found'}\\n`;
+                status.textContent += `Render mode: ${renderMode ? renderMode.value : '❌ None'}\\n`;
+                status.textContent += `On emoji: ${onInput ? onInput.value : '❌'}\\n`;
+                status.textContent += `Off emoji: ${offInput ? offInput.value : '❌'}\\n`;
+                
+                // Call the function
+                status.textContent += '\\nCalling generateEmoji()...\\n';
+                generateEmoji();
+                
+                status.textContent += '✅ Function call completed successfully!';
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                status.textContent += `\\n❌ ERROR: ${error.message}`;
+            }
+        }
+        
+        // Debug logging
+        console.log('🚀 Test page loaded');
+        console.log('Available functions:', {
+            generateEmoji: typeof generateEmoji,
+            generateTextToEmoji: typeof generateTextToEmoji
+        });
+        
+        // Auto-run test after a delay
+        setTimeout(() => {
+            console.log('Running auto-test...');
+            testGenerateEmoji();
+        }, 1000);
+    </script>
+</body>
+</html>

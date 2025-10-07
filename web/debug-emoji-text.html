@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Text to Emoji</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        .test { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .result { background: #e9ecef; padding: 15px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <h1>🐛 Debug Text to Emoji Function</h1>
+    
+    <div class="test">
+        <h3>Direct Function Test</h3>
+        <button onclick="testDirectFunction()">Test generateTextToEmoji Directly</button>
+        <div id="direct-result" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Main App Emoji Generation Test</h3>
+        <label>Text: <input type="text" id="test-text" value="HI" placeholder="Enter text"></label><br>
+        <button onclick="testMainAppFunction()">Test via generateEmoji()</button>
+        <div id="main-result" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Function Existence Check</h3>
+        <button onclick="checkFunctions()">Check All Functions</button>
+        <div id="function-result" class="result"></div>
+    </div>
+    
+    <script src="script-simple.js"></script>
+    <script>
+        function testDirectFunction() {
+            const result = document.getElementById('direct-result');
+            
+            try {
+                console.log('Testing generateTextToEmoji directly...');
+                
+                if (typeof generateTextToEmoji !== 'function') {
+                    throw new Error('generateTextToEmoji function not found');
+                }
+                
+                const output = generateTextToEmoji('HI', '🔥', '⚪');
+                console.log('Direct function result:', output);
+                
+                if (!output) {
+                    throw new Error('Function returned empty result');
+                }
+                
+                result.className = 'result success';
+                result.textContent = `✅ SUCCESS\\n\\nDirect function call result:\\n${output}`;
+                
+            } catch (error) {
+                console.error('Direct function test failed:', error);
+                result.className = 'result error';
+                result.textContent = `❌ ERROR: ${error.message}`;
+            }
+        }
+        
+        function testMainAppFunction() {
+            const result = document.getElementById('main-result');
+            const text = document.getElementById('test-text').value;
+            
+            try {
+                console.log('Testing via generateEmoji function...');
+                
+                // Create mock elements for the test
+                const mockTextInput = document.createElement('input');
+                mockTextInput.id = 'emoji-text';
+                mockTextInput.value = text;
+                document.body.appendChild(mockTextInput);
+                
+                const mockOutput = {
+                    textContent: '',
+                    set textContent(value) {
+                        this._content = value;
+                        console.log('Output set to:', value);
+                    },
+                    get textContent() {
+                        return this._content || '';
+                    }
+                };
+                
+                // Mock render mode radio
+                const mockRadio = document.createElement('input');
+                mockRadio.type = 'radio';
+                mockRadio.name = 'emoji-render-mode';
+                mockRadio.value = 'binary';
+                mockRadio.checked = true;
+                document.body.appendChild(mockRadio);
+                
+                // Mock emoji inputs
+                const mockOnEmoji = document.createElement('input');
+                mockOnEmoji.id = 'on-emoji';
+                mockOnEmoji.value = '🔥';
+                document.body.appendChild(mockOnEmoji);
+                
+                const mockOffEmoji = document.createElement('input');
+                mockOffEmoji.id = 'off-emoji';
+                mockOffEmoji.value = '⚪';
+                document.body.appendChild(mockOffEmoji);
+                
+                // Test the generateEmoji function logic manually
+                const renderMode = document.querySelector('input[name="emoji-render-mode"]:checked');
+                let onEmoji = '🔥';
+                let offEmoji = '⚪';
+                
+                if (renderMode && renderMode.value === 'binary') {
+                    const onInput = document.getElementById('on-emoji');
+                    const offInput = document.getElementById('off-emoji');
+                    onEmoji = onInput ? (onInput.value.trim() || '🔥') : '🔥';
+                    offEmoji = offInput ? (offInput.value.trim() || '⚪') : '⚪';
+                }
+                
+                console.log('Settings:', { text, onEmoji, offEmoji, renderMode: renderMode?.value });
+                
+                const output = generateTextToEmoji(text.toUpperCase(), onEmoji, offEmoji);
+                
+                // Clean up mock elements
+                document.body.removeChild(mockTextInput);
+                document.body.removeChild(mockRadio);
+                document.body.removeChild(mockOnEmoji);
+                document.body.removeChild(mockOffEmoji);
+                
+                if (!output) {
+                    throw new Error('generateTextToEmoji returned empty result');
+                }
+                
+                result.className = 'result success';
+                result.textContent = `✅ SUCCESS\\n\\nMain app logic result:\\n${output}`;
+                
+            } catch (error) {
+                console.error('Main app function test failed:', error);
+                result.className = 'result error';
+                result.textContent = `❌ ERROR: ${error.message}`;
+            }
+        }
+        
+        function checkFunctions() {
+            const result = document.getElementById('function-result');
+            
+            const functions = [
+                'generateTextToEmoji',
+                'generateEmoji',
+                'handleEmojiModeChange',
+                'handleEmojiRenderModeChange'
+            ];
+            
+            let report = 'Function Availability Check:\\n\\n';
+            let allFound = true;
+            
+            functions.forEach(func => {
+                const exists = typeof window[func] === 'function';
+                report += `${exists ? '✅' : '❌'} ${func}: ${exists ? 'Available' : 'Missing'}\\n`;
+                if (!exists) allFound = false;
+            });
+            
+            // Test the letter patterns
+            try {
+                const testResult = generateTextToEmoji('A', '1', '0');
+                report += `\\n✅ Letter pattern test: ${testResult ? 'Working' : 'Failed'}\\n`;
+                if (testResult) {
+                    report += `Sample 'A' pattern:\\n${testResult}`;
+                }
+            } catch (error) {
+                report += `\\n❌ Letter pattern test failed: ${error.message}`;
+                allFound = false;
+            }
+            
+            result.className = `result ${allFound ? 'success' : 'error'}`;
+            result.textContent = report;
+        }
+        
+        // Auto-run tests
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Debug page loaded');
+            setTimeout(() => {
+                testDirectFunction();
+                checkFunctions();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

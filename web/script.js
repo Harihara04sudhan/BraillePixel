@@ -20,23 +20,53 @@ function getApiEndpoint(endpoint) {
     return apiUrl;
 }
 
-// Tab functionality
+// Tab functionality - simplified and robust
 function showTab(tabName) {
-    // Hide all tab contents
-    const contents = document.querySelectorAll('.tab-content');
-    contents.forEach(content => content.classList.remove('active'));
+    console.log('showTab called with:', tabName);
     
-    // Remove active class from all buttons
-    const buttons = document.querySelectorAll('.tab-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    
-    // Show selected tab
-    document.getElementById(tabName).classList.add('active');
-    event.target.classList.add('active');
+    try {
+        // Hide all tab contents
+        const contents = document.querySelectorAll('.tab-content');
+        console.log('Found tab contents:', contents.length);
+        contents.forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // Remove active class from all buttons
+        const buttons = document.querySelectorAll('.tab-btn');
+        console.log('Found tab buttons:', buttons.length);
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Show selected tab
+        const selectedTab = document.getElementById(tabName);
+        if (selectedTab) {
+            selectedTab.classList.add('active');
+            console.log('Activated tab:', tabName);
+        } else {
+            console.error('Tab not found:', tabName);
+        }
+        
+        // Find and activate the clicked button
+        const clickedButton = event ? event.target : document.querySelector(`[onclick*="'${tabName}'"]`);
+        if (clickedButton) {
+            clickedButton.classList.add('active');
+            console.log('Activated button');
+        } else {
+            console.error('Button not found for tab:', tabName);
+        }
+        
+    } catch (error) {
+        console.error('Error in showTab:', error);
+    }
 }
 
-// Update range slider displays
+// DOM Content Loaded - Initialize all functionality
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing BraillePixel...');
+    
+    // Update range slider displays
     const rangeInputs = document.querySelectorAll('input[type="range"]');
     rangeInputs.forEach(input => {
         const valueSpan = document.getElementById(input.id + '-val');
@@ -85,98 +115,220 @@ document.addEventListener('DOMContentLoaded', function() {
     const emojiSetSelect = document.getElementById('emoji-set');
     const customEmojiInput = document.getElementById('custom-emoji-input');
     
-    emojiSetSelect.addEventListener('change', function() {
-        if (this.value === 'custom') {
+    if (emojiSetSelect && customEmojiInput) {
+        emojiSetSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customEmojiInput.style.display = 'block';
+            } else {
+                customEmojiInput.style.display = 'none';
+            }
+        });
+        
+        // Initialize custom emoji input visibility
+        if (emojiSetSelect.value === 'custom') {
             customEmojiInput.style.display = 'block';
         } else {
             customEmojiInput.style.display = 'none';
         }
-    });
-    
-    // Initialize custom emoji input visibility
-    if (emojiSetSelect.value === 'custom') {
-        customEmojiInput.style.display = 'block';
-    } else {
-        customEmojiInput.style.display = 'none';
     }
+    
+    // File upload handling
+    initializeFileUploads();
+    
+    console.log('BraillePixel initialization complete!');
 });
+
+// Separate function for file upload initialization
+function initializeFileUploads() {
+    console.log('Initializing file uploads...');
+    
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    console.log(`Found ${fileInputs.length} file inputs`);
+    
+    fileInputs.forEach((input, index) => {
+        console.log(`Setting up file input ${index}: ${input.id}`);
+        
+        const uploadArea = input.closest('.upload-area');
+        if (!uploadArea) {
+            console.error(`No upload area found for input ${input.id}`);
+            return;
+        }
+        
+        // Make the upload area clickable
+        uploadArea.addEventListener('click', (e) => {
+            console.log('Upload area clicked for:', input.id);
+            e.preventDefault();
+            e.stopPropagation();
+            input.click();
+        });
+        
+        // File input change handler
+        input.addEventListener('change', (e) => {
+            console.log('File selected for:', input.id);
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                const paragraph = uploadArea.querySelector('p');
+                if (paragraph) {
+                    paragraph.innerHTML = `✅ Selected: <strong>${fileName}</strong>`;
+                    uploadArea.style.borderColor = '#48bb78';
+                    uploadArea.style.backgroundColor = 'rgba(72, 187, 120, 0.1)';
+                }
+                console.log('File processed:', fileName);
+            }
+        });
+        
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.add('dragover');
+                uploadArea.style.borderColor = '#667eea';
+                uploadArea.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
+            });
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.remove('dragover');
+                uploadArea.style.borderColor = '#cbd5e0';
+                uploadArea.style.backgroundColor = '';
+            });
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                input.files = files;
+                const fileName = files[0].name;
+                const paragraph = uploadArea.querySelector('p');
+                if (paragraph) {
+                    paragraph.innerHTML = `✅ Selected: <strong>${fileName}</strong>`;
+                    uploadArea.style.borderColor = '#48bb78';
+                    uploadArea.style.backgroundColor = 'rgba(72, 187, 120, 0.1)';
+                }
+            }
+        });
+    });
+}
 
 // Braille Art Generation (Real API calls)
 function generateBraille() {
-    console.log('Starting braille generation...');
+    console.log('🎯 generateBraille called');
     
-    const fileInput = document.getElementById('braille-file');
-    const output = document.getElementById('output');
-    
-    if (!fileInput.files[0]) {
-        output.textContent = 'Please select an image file first.';
-        return;
-    }
-    
-    const cols = document.getElementById('braille-cols').value;
-    const rows = document.getElementById('braille-rows').value;
-    const threshold = document.getElementById('braille-threshold').value;
-    const invert = document.getElementById('braille-invert').checked;
-    
-    console.log('Parameters:', { cols, rows, threshold, invert });
-    
-    output.textContent = 'Processing image...';
-    
-    // Read the file and convert to base64
-    const file = fileInput.files[0];
-    console.log('Processing file:', file.name, 'Size:', file.size, 'Type:', file.type);
-    
-    const reader = new FileReader();
-    
-    reader.onload = function(e) {
-        const imageData = e.target.result;
-        console.log('Image data loaded, length:', imageData.length);
+    try {
+        const fileInput = document.getElementById('braille-file');
+        const output = document.getElementById('output');
         
-        const apiUrl = getApiEndpoint('braille');
-        console.log('Making request to:', apiUrl);
+        console.log('File input:', fileInput);
+        console.log('Output element:', output);
         
-        // Call the backend API
-        fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                image: imageData,
-                cols: parseInt(cols),
-                rows: parseInt(rows),
-                threshold: parseInt(threshold),
-                invert: invert
+        if (!fileInput) {
+            console.error('File input not found');
+            return;
+        }
+        
+        if (!output) {
+            console.error('Output element not found');
+            return;
+        }
+        
+        if (!fileInput.files[0]) {
+            const message = 'Please select an image file first.';
+            console.log('No file selected');
+            output.textContent = message;
+            return;
+        }
+        
+        const cols = document.getElementById('braille-cols').value;
+        const rows = document.getElementById('braille-rows').value;
+        const threshold = document.getElementById('braille-threshold').value;
+        const invert = document.getElementById('braille-invert').checked;
+        
+        console.log('Parameters:', { cols, rows, threshold, invert });
+        
+        output.textContent = 'Processing image...';
+        
+        // Read the file and convert to base64
+        const file = fileInput.files[0];
+        console.log('Processing file:', file.name, 'Size:', file.size, 'Type:', file.type);
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const imageData = e.target.result;
+            console.log('Image data loaded, length:', imageData.length);
+            
+            const apiUrl = getApiEndpoint('braille');
+            console.log('Making request to:', apiUrl);
+            
+            // Call the backend API
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image: imageData,
+                    cols: parseInt(cols),
+                    rows: parseInt(rows),
+                    threshold: parseInt(threshold),
+                    invert: invert
+                })
             })
-        })
-        .then(response => {
-            console.log('Braille API Response Status:', response.status);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Braille API Response Data:', data);
-            if (data.error) {
-                output.textContent = 'Error: ' + data.error;
-                if (data.stack) {
-                    console.error('Server Stack:', data.stack);
+            .then(response => {
+                console.log('Braille API Response Status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-            } else {
-                output.textContent = data.result;
-                if (data.debug) {
-                    console.log('Debug Info:', data.debug);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Braille API Response Data:', data);
+                if (data.error) {
+                    console.error('API Error:', data.error);
+                    // Fallback to demo pattern
+                    output.textContent = 'API Error - Showing demo pattern:\n\n' + generateDemoBrailleArt(parseInt(cols), parseInt(rows));
+                    if (data.stack) {
+                        console.error('Server Stack:', data.stack);
+                    }
+                } else {
+                    output.textContent = data.result;
+                    if (data.debug) {
+                        console.log('Debug Info:', data.debug);
+                    }
                 }
-            }
-        })
-        .catch(error => {
-            console.error('Braille Generation Error:', error);
-            output.textContent = 'Error processing image: ' + error.message;
-        });
-    };
-    
-    reader.readAsDataURL(file);
+            })
+            .catch(error => {
+                console.error('Braille Generation Error:', error);
+                // Show demo pattern as fallback
+                const demoPattern = generateDemoBrailleArt(parseInt(cols), parseInt(rows));
+                output.textContent = `Connection Error - Showing demo pattern:
+
+${demoPattern}
+
+Original Error: ${error.message}
+
+💡 Try refreshing the page or check your internet connection.`;
+            });
+        };
+        
+        reader.readAsDataURL(file);
+        
+    } catch (error) {
+        console.error('Error in generateBraille:', error);
+        const output = document.getElementById('output');
+        if (output) {
+            output.textContent = 'Error: ' + error.message;
+        }
+    }
 }
 
 function generateDemoBrailleArt(cols, rows) {
@@ -246,17 +398,43 @@ function generateEmoji() {
                 },
                 body: JSON.stringify(requestData)
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Emoji API Response Status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Emoji API Response Data:', data);
                 if (data.error) {
-                    output.textContent = 'Error: ' + data.error;
+                    console.error('API Error:', data.error);
+                    // Fallback to demo pattern
+                    const demoPattern = generateDemoEmojiArt(
+                        requestData.emoji_set || 'geometric', 
+                        requestData.custom_emojis || '', 
+                        requestData.width
+                    );
+                    output.textContent = 'API Error - Showing demo pattern:\n\n' + demoPattern;
                 } else {
                     output.textContent = data.result;
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                output.textContent = 'Error processing image: ' + error.message;
+                console.error('Emoji Generation Error:', error);
+                // Show demo pattern as fallback
+                const demoPattern = generateDemoEmojiArt(
+                    requestData.emoji_set || 'geometric', 
+                    requestData.custom_emojis || '', 
+                    requestData.width
+                );
+                output.textContent = `Connection Error - Showing demo pattern:
+
+${demoPattern}
+
+Original Error: ${error.message}
+
+💡 Try refreshing the page or check your internet connection.`;
             });
         };
         
@@ -302,17 +480,35 @@ function generateEmoji() {
                 threshold: threshold
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Emoji Text API Response Status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Emoji Text API Response Data:', data);
             if (data.error) {
-                output.textContent = 'Error: ' + data.error;
+                console.error('API Error:', data.error);
+                // Fallback to demo pattern
+                const demoPattern = generateDemoEmojiText(text, onEmoji, parseInt(width));
+                output.textContent = 'API Error - Showing demo pattern:\n\n' + demoPattern;
             } else {
                 output.textContent = data.result;
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            output.textContent = 'Error generating text: ' + error.message;
+            console.error('Emoji Text Generation Error:', error);
+            // Show demo pattern as fallback
+            const demoPattern = generateDemoEmojiText(text, onEmoji, parseInt(width));
+            output.textContent = `Connection Error - Showing demo pattern:
+
+${demoPattern}
+
+Original Error: ${error.message}
+
+💡 Try refreshing the page or check your internet connection.`;
         });
     }
 }
@@ -405,17 +601,35 @@ function generateASCII() {
             gradient: gradient
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('ASCII API Response Status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('ASCII API Response Data:', data);
         if (data.error) {
-            output.textContent = 'Error: ' + data.error;
+            console.error('API Error:', data.error);
+            // Fallback to demo pattern
+            const demoPattern = generateDemoASCIIArt(text, font, spacing, border, gradient);
+            output.textContent = 'API Error - Showing demo pattern:\n\n' + demoPattern;
         } else {
             output.textContent = data.result;
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        output.textContent = 'Error generating ASCII: ' + error.message;
+        console.error('ASCII Generation Error:', error);
+        // Show demo pattern as fallback
+        const demoPattern = generateDemoASCIIArt(text, font, spacing, border, gradient);
+        output.textContent = `Connection Error - Showing demo pattern:
+
+${demoPattern}
+
+Original Error: ${error.message}
+
+💡 Try refreshing the page or check your internet connection.`;
     });
 }
 
@@ -427,22 +641,102 @@ function generateDemoASCIIArt(text, font, spacing, border, gradient) {
             'C': [' █████', '██    ', '██    ', '██    ', ' █████'],
             'D': ['██████', '██  ██', '██  ██', '██  ██', '██████'],
             'E': ['██████', '██    ', '█████ ', '██    ', '██████'],
+            'F': ['██████', '██    ', '█████ ', '██    ', '██    '],
+            'G': [' █████', '██    ', '██ ███', '██  ██', ' █████'],
             'H': ['██  ██', '██  ██', '██████', '██  ██', '██  ██'],
+            'I': ['██████', '  ██  ', '  ██  ', '  ██  ', '██████'],
+            'J': ['██████', '    ██', '    ██', '██  ██', ' █████'],
+            'K': ['██  ██', '██ ██ ', '████  ', '██ ██ ', '██  ██'],
             'L': ['██    ', '██    ', '██    ', '██    ', '██████'],
+            'M': ['██  ██', '██████', '██████', '██  ██', '██  ██'],
+            'N': ['██  ██', '███ ██', '██████', '██ ███', '██  ██'],
             'O': [' █████', '██  ██', '██  ██', '██  ██', ' █████'],
+            'P': ['██████', '██  ██', '██████', '██    ', '██    '],
+            'Q': [' █████', '██  ██', '██  ██', '██ ███', ' ██████'],
+            'R': ['██████', '██  ██', '██████', '██ ██ ', '██  ██'],
+            'S': [' █████', '██    ', ' █████', '    ██', ' █████'],
+            'T': ['██████', '  ██  ', '  ██  ', '  ██  ', '  ██  '],
+            'U': ['██  ██', '██  ██', '██  ██', '██  ██', ' █████'],
+            'V': ['██  ██', '██  ██', '██  ██', ' ████ ', '  ██  '],
+            'W': ['██  ██', '██  ██', '██████', '██████', '██  ██'],
+            'X': ['██  ██', ' ████ ', '  ██  ', ' ████ ', '██  ██'],
+            'Y': ['██  ██', '██  ██', ' ████ ', '  ██  ', '  ██  '],
+            'Z': ['██████', '   ██ ', '  ██  ', ' ██   ', '██████'],
             ' ': ['      ', '      ', '      ', '      ', '      ']
         },
         'simple': {
             'A': [' ## ', '####', '# ##', '####', '# ##'],
             'B': ['### ', '# ##', '### ', '# ##', '### '],
             'C': ['####', '#   ', '#   ', '#   ', '####'],
+            'D': ['### ', '# ##', '# ##', '# ##', '### '],
             'E': ['####', '#   ', '### ', '#   ', '####'],
+            'F': ['####', '#   ', '### ', '#   ', '#   '],
+            'G': ['####', '#   ', '# ##', '# ##', '####'],
             'H': ['# ##', '# ##', '####', '# ##', '# ##'],
+            'I': ['####', ' ## ', ' ## ', ' ## ', '####'],
+            'J': ['####', '  ##', '  ##', '# ##', '####'],
+            'K': ['# ##', '### ', '##  ', '### ', '# ##'],
             'L': ['#   ', '#   ', '#   ', '#   ', '####'],
+            'M': ['# ##', '####', '####', '# ##', '# ##'],
+            'N': ['# ##', '####', '####', '####', '# ##'],
             'O': [' ## ', '# ##', '# ##', '# ##', ' ## '],
+            'P': ['### ', '# ##', '### ', '#   ', '#   '],
+            'Q': [' ## ', '# ##', '# ##', '####', ' ###'],
+            'R': ['### ', '# ##', '### ', '# ##', '# ##'],
+            'S': ['####', '#   ', '### ', '  ##', '### '],
+            'T': ['####', ' ## ', ' ## ', ' ## ', ' ## '],
+            'U': ['# ##', '# ##', '# ##', '# ##', '####'],
+            'V': ['# ##', '# ##', '# ##', '####', ' ## '],
+            'W': ['# ##', '# ##', '####', '####', '# ##'],
+            'X': ['# ##', '####', ' ## ', '####', '# ##'],
+            'Y': ['# ##', '# ##', '####', ' ## ', ' ## '],
+            'Z': ['####', ' ## ', ' ## ', ' ## ', '####'],
             ' ': ['    ', '    ', '    ', '    ', '    ']
         }
     };
+    
+    const selectedFont = fonts[font] || fonts['block'];
+    const upperText = text.toUpperCase();
+    let result = [];
+    
+    // Generate each row
+    for (let row = 0; row < 5; row++) {
+        let line = '';
+        for (let i = 0; i < upperText.length; i++) {
+            const char = upperText[i];
+            const pattern = selectedFont[char] || selectedFont[' '];
+            line += pattern[row];
+            
+            // Add spacing between characters
+            if (spacing > 0 && i < upperText.length - 1) {
+                line += ' '.repeat(spacing);
+            }
+        }
+        result.push(line);
+    }
+    
+    let finalResult = result.join('\n');
+    
+    // Add border if requested
+    if (border) {
+        const maxWidth = Math.max(...result.map(line => line.length));
+        const borderTop = '█'.repeat(maxWidth + 4);
+        const borderSides = result.map(line => '██' + line.padEnd(maxWidth) + '██');
+        const borderBottom = '█'.repeat(maxWidth + 4);
+        
+        finalResult = [borderTop, ...borderSides, borderBottom].join('\n');
+    }
+    
+    // Apply gradient effect (simple version)
+    if (gradient) {
+        const gradientChars = ['░', '▒', '▓', '█'];
+        finalResult = finalResult.replace(/█/g, () => {
+            return gradientChars[Math.floor(Math.random() * gradientChars.length)];
+        });
+    }
+    
+    return finalResult;
+}
     
     const fontData = fonts[font] || fonts.block;
     const height = 5;
@@ -566,6 +860,56 @@ function showCopyError() {
     alert('Copy failed. Try:\n- Right-click the output and select "Copy"\n- Or select all text manually (Ctrl+A) then copy (Ctrl+C)');
 }
 
+function selectOutput() {
+    const output = document.getElementById('output');
+    
+    if (window.getSelection) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(output);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else if (document.selection) {
+        const range = document.body.createTextRange();
+        range.moveToElementText(output);
+        range.select();
+    }
+}
+
+function downloadOutput() {
+    const output = document.getElementById('output');
+    const text = output.textContent;
+    
+    if (!text || text.includes('Your generated art will appear here')) {
+        alert('No art to download. Generate some art first!');
+        return;
+    }
+    
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    a.href = url;
+    a.download = 'braillepixel-art.txt';
+    a.style.display = 'none';
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    // Show feedback
+    const btn = document.querySelector('.download-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '✓ Downloaded!';
+    btn.style.background = '#48bb78';
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+    }, 2000);
+}
+
+// Additional download function for compatibility
 function downloadOutput() {
     const output = document.getElementById('output');
     const content = output.textContent;
@@ -583,52 +927,6 @@ function downloadOutput() {
     a.click();
     window.URL.revokeObjectURL(url);
 }
-
-// File upload handling
-document.addEventListener('DOMContentLoaded', function() {
-    const fileInputs = document.querySelectorAll('input[type="file"]');
-    
-    fileInputs.forEach(input => {
-        const uploadArea = input.closest('.upload-area');
-        
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, () => {
-                uploadArea.style.borderColor = '#667eea';
-                uploadArea.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
-            });
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, () => {
-                uploadArea.style.borderColor = '#cbd5e0';
-                uploadArea.style.backgroundColor = '';
-            });
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                input.files = files;
-                uploadArea.querySelector('p').textContent = `Selected: ${files[0].name}`;
-            }
-        });
-        
-        input.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                uploadArea.querySelector('p').textContent = `Selected: ${e.target.files[0].name}`;
-            }
-        });
-    });
-});
 
 function selectOutput() {
     const output = document.getElementById('output');

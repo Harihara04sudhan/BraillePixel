@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Emoji Feature Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 20px auto; padding: 20px; }
+        .test-section { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .result { background: #e9ecef; padding: 15px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+        button { background: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; font-weight: bold; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Complete Emoji Feature Test</h1>
+    <p>Testing all emoji art features to ensure they work correctly.</p>
+    
+    <div class="grid">
+        <div class="test-section">
+            <h3>📝 Text to Emoji (Binary Mode)</h3>
+            <button onclick="testTextEmojiBinary()">Test Binary Mode</button>
+            <div id="text-binary-status" class="status">Not tested</div>
+            <div id="text-binary-result" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🌈 Text to Emoji (Gradient Mode)</h3>
+            <button onclick="testTextEmojiGradient()">Test Gradient Mode</button>
+            <div id="text-gradient-status" class="status">Not tested</div>
+            <div id="text-gradient-result" class="result" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔧 Mode Switching Test</h3>
+        <button onclick="testModeSwitching()">Test UI Mode Switching</button>
+        <div id="mode-status" class="status">Not tested</div>
+        <div id="mode-result" class="result" style="display:none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🚀 Run All Emoji Tests</h3>
+        <button onclick="runAllEmojiTests()" style="background: #28a745;">Run Complete Test Suite</button>
+        <div id="overall-status" class="status">Ready to test</div>
+    </div>
+    
+    <script src="script-simple.js"></script>
+    <script>
+        let testsRun = 0;
+        let testsPassed = 0;
+        
+        function updateStatus(elementId, message, success) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `status ${success ? 'pass' : 'fail'}`;
+        }
+        
+        function showResult(elementId, content) {
+            const el = document.getElementById(elementId);
+            el.textContent = content;
+            el.style.display = 'block';
+        }
+        
+        function testTextEmojiBinary() {
+            console.log('Testing text to emoji (binary mode)...');
+            testsRun++;
+            
+            try {
+                const result = generateTextToEmoji('HI', '🔥', '⚪');
+                
+                if (!result || result.length === 0) {
+                    throw new Error('No output generated');
+                }
+                
+                if (!result.includes('🔥') || !result.includes('⚪')) {
+                    throw new Error('Result does not contain expected emojis');
+                }
+                
+                const lines = result.split('\\n');
+                if (lines.length !== 5) {
+                    throw new Error(`Expected 5 lines, got ${lines.length}`);
+                }
+                
+                updateStatus('text-binary-status', '✅ PASS - Binary mode working', true);
+                showResult('text-binary-result', `Input: "HI" (🔥/⚪)\\n\\n${result}`);
+                testsPassed++;
+                console.log('✅ Text emoji binary test passed');
+                
+            } catch (error) {
+                updateStatus('text-binary-status', `❌ FAIL - ${error.message}`, false);
+                console.error('❌ Text emoji binary test failed:', error);
+            }
+            
+            updateOverallStatus();
+        }
+        
+        function testTextEmojiGradient() {
+            console.log('Testing text to emoji (gradient mode)...');
+            testsRun++;
+            
+            try {
+                // Test with different emojis
+                const result = generateTextToEmoji('OK', '✅', '❌');
+                
+                if (!result || result.length === 0) {
+                    throw new Error('No output generated');
+                }
+                
+                if (!result.includes('✅') || !result.includes('❌')) {
+                    throw new Error('Result does not contain expected emojis');
+                }
+                
+                updateStatus('text-gradient-status', '✅ PASS - Gradient mode working', true);
+                showResult('text-gradient-result', `Input: "OK" (✅/❌)\\n\\n${result}`);
+                testsPassed++;
+                console.log('✅ Text emoji gradient test passed');
+                
+            } catch (error) {
+                updateStatus('text-gradient-status', `❌ FAIL - ${error.message}`, false);
+                console.error('❌ Text emoji gradient test failed:', error);
+            }
+            
+            updateOverallStatus();
+        }
+        
+        function testModeSwitching() {
+            console.log('Testing mode switching functionality...');
+            testsRun++;
+            
+            try {
+                // Test if functions exist
+                if (typeof handleEmojiModeChange !== 'function') {
+                    throw new Error('handleEmojiModeChange function not found');
+                }
+                
+                if (typeof handleEmojiRenderModeChange !== 'function') {
+                    throw new Error('handleEmojiRenderModeChange function not found');
+                }
+                
+                // Create test elements in iframe
+                const iframe = document.createElement('iframe');
+                iframe.src = 'index.html';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                iframe.onload = function() {
+                    try {
+                        const doc = iframe.contentDocument;
+                        
+                        // Test element existence
+                        const imageInput = doc.getElementById('emoji-image-input');
+                        const textInput = doc.getElementById('emoji-text-input');
+                        const gradientControls = doc.getElementById('gradient-controls');
+                        const binaryControls = doc.getElementById('binary-controls');
+                        
+                        if (!imageInput || !textInput || !gradientControls || !binaryControls) {
+                            throw new Error('Required UI elements not found');
+                        }
+                        
+                        updateStatus('mode-status', '✅ PASS - Mode switching elements available', true);
+                        showResult('mode-result', 
+                            'Mode switching functions: ✅ Available\\n' +
+                            'UI elements: ✅ All found\\n' +
+                            '- Image input container\\n' +
+                            '- Text input container\\n' +
+                            '- Gradient controls\\n' +
+                            '- Binary controls');
+                        testsPassed++;
+                        console.log('✅ Mode switching test passed');
+                        
+                        document.body.removeChild(iframe);
+                        
+                    } catch (error) {
+                        updateStatus('mode-status', `❌ FAIL - ${error.message}`, false);
+                        console.error('❌ Mode switching test failed:', error);
+                        document.body.removeChild(iframe);
+                    }
+                    
+                    updateOverallStatus();
+                };
+                
+                // Timeout fallback
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        updateStatus('mode-status', '❌ FAIL - Timeout loading test page', false);
+                        document.body.removeChild(iframe);
+                        updateOverallStatus();
+                    }
+                }, 5000);
+                
+            } catch (error) {
+                updateStatus('mode-status', `❌ FAIL - ${error.message}`, false);
+                console.error('❌ Mode switching test failed:', error);
+                updateOverallStatus();
+            }
+        }
+        
+        function updateOverallStatus() {
+            const el = document.getElementById('overall-status');
+            
+            if (testsRun === 0) {
+                el.textContent = 'Ready to test';
+                el.className = 'status';
+                return;
+            }
+            
+            const percentage = Math.round((testsPassed / testsRun) * 100);
+            
+            if (testsPassed === testsRun) {
+                el.textContent = `🎉 All ${testsRun} emoji tests passed! (${percentage}%)`;
+                el.className = 'status pass';
+            } else {
+                el.textContent = `⚠️ ${testsPassed}/${testsRun} tests passed (${percentage}%)`;
+                el.className = 'status fail';
+            }
+        }
+        
+        async function runAllEmojiTests() {
+            console.log('🚀 Running complete emoji test suite...');
+            testsRun = 0;
+            testsPassed = 0;
+            
+            // Reset all status
+            const statusElements = document.querySelectorAll('.status');
+            statusElements.forEach(el => {
+                if (el.id !== 'overall-status') {
+                    el.textContent = 'Testing...';
+                    el.className = 'status';
+                }
+            });
+            
+            updateStatus('overall-status', 'Running tests...', false);
+            
+            // Run tests with delays
+            testTextEmojiBinary();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testTextEmojiGradient();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testModeSwitching();
+            
+            console.log(`🏁 Emoji test suite completed: ${testsPassed}/${testsRun} passed`);
+        }
+        
+        // Auto-run basic test
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Emoji test page loaded');
+            setTimeout(() => {
+                if (typeof generateTextToEmoji === 'function') {
+                    console.log('✅ generateTextToEmoji function available');
+                } else {
+                    console.error('❌ generateTextToEmoji function not found');
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

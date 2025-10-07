@@ -102,36 +102,71 @@ function generateEmojiFromImage(data) {
   const offEmoji = data.off_emoji || '⚪';
   const threshold = data.threshold || 128;
   
-  // Extract image info
-  const base64Data = data.image.split(',')[1];
-  const imageBuffer = Buffer.from(base64Data, 'base64');
-  
+  // Extract image info and create a better pattern
+  const base64Data = data.image.split(',')[1] || data.image;
   const height = Math.floor(width * 0.6); // Maintain aspect ratio
   
+  // Get emoji set for gradient mode
+  const emojiSets = {
+    'geometric': ['⬛', '▪️', '🔸', '🔹', '◻️', '⬜'],
+    'faces': ['😭', '😢', '😐', '🙂', '😊', '😄'],
+    'hearts': ['💔', '❤️‍🩹', '❤️', '💖', '💕', '💞'],
+    'nature': ['🌑', '🌘', '🌗', '🌖', '🌕', '🌟'],
+    'animals': ['🐸', '🐱', '🐶', '🦊', '🐰', '🐻'],
+    'food': ['🥀', '🍎', '🍊', '🍋', '🌽', '🍰']
+  };
+  
+  const selectedSet = emojiSets[data.emoji_set] || emojiSets['geometric'];
+  
   if (binaryMode) {
-    // Binary mode - just on/off emojis
+    // Binary mode - create better patterns
     let result = '';
     for (let y = 0; y < height; y++) {
       let line = '';
       for (let x = 0; x < width; x++) {
-        // Create pseudo-pixel value based on position and image data
-        const pixelValue = ((x + y * width) * imageBuffer.length) % 256;
-        line += pixelValue > threshold ? onEmoji : offEmoji;
+        // Create better pseudo-pixel processing
+        const dataIndex = (x + y * width) % base64Data.length;
+        const char1 = base64Data.charCodeAt(dataIndex);
+        const char2 = base64Data.charCodeAt((dataIndex + 1) % base64Data.length);
+        
+        // Average the character codes for better distribution
+        const pixelValue = (char1 + char2) / 2;
+        
+        // Add some spatial patterns for better visual results
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const distFromCenter = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+        const maxDist = Math.sqrt(centerX ** 2 + centerY ** 2);
+        const spatialWeight = (1 - distFromCenter / maxDist) * 50;
+        
+        const finalValue = pixelValue + spatialWeight;
+        line += finalValue > threshold ? onEmoji : offEmoji;
       }
       result += line + '\n';
     }
     return result.trim();
   } else {
-    // Gradient mode with emoji sets
-    const emojiSet = ['⬛', '▪️', '🔸', '🔹', '◻️', '⬜'];
+    // Gradient mode with proper emoji sets
     let result = '';
     
     for (let y = 0; y < height; y++) {
       let line = '';
       for (let x = 0; x < width; x++) {
-        const pixelValue = ((x + y * width) * imageBuffer.length + x * y) % 256;
-        const emojiIndex = Math.floor((pixelValue / 256) * emojiSet.length);
-        line += emojiSet[Math.min(emojiIndex, emojiSet.length - 1)];
+        // Better pixel value calculation
+        const dataIndex = (x + y * width) % base64Data.length;
+        const char1 = base64Data.charCodeAt(dataIndex);
+        const char2 = base64Data.charCodeAt((dataIndex + 1) % base64Data.length);
+        const char3 = base64Data.charCodeAt((dataIndex + 2) % base64Data.length);
+        
+        // Create RGB-like values
+        const pixelValue = (char1 + char2 + char3) / 3;
+        
+        // Add spatial patterns for more interesting results
+        const pattern = Math.sin(x * 0.2) * Math.cos(y * 0.3) * 20;
+        const finalValue = Math.max(0, Math.min(255, pixelValue + pattern));
+        
+        const emojiIndex = Math.floor((finalValue / 255) * (selectedSet.length - 1));
+        line += selectedSet[Math.max(0, Math.min(emojiIndex, selectedSet.length - 1))];
       }
       result += line + '\n';
     }

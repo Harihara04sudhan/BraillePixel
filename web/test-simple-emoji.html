@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Text to Emoji Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
+        .result { background: #f8f9fa; padding: 15px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; border: 1px solid #dee2e6; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; width: 100px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Simple Text to Emoji Test</h1>
+    
+    <div style="margin: 20px 0;">
+        <label>Text: <input type="text" id="input-text" value="HI"></label><br>
+        <label>On Emoji: <input type="text" id="input-on" value="🔥"></label><br>
+        <label>Off Emoji: <input type="text" id="input-off" value="⚪"></label><br>
+        <button onclick="generateTest()">Generate</button>
+    </div>
+    
+    <div id="output" class="result">Output will appear here...</div>
+    
+    <script>
+        // Copy the function directly to test
+        function generateTextToEmoji(text, onEmoji, offEmoji) {
+            console.log('generateTextToEmoji called with:', {text, onEmoji, offEmoji});
+            
+            // Use 1 and 0 for patterns, then replace with actual emojis
+            const letterPatterns = {
+                'A': ['01110', '10001', '11111', '10001', '10001'],
+                'B': ['11110', '10001', '11110', '10001', '11110'],
+                'C': ['01110', '10000', '10000', '10000', '01110'],
+                'D': ['11110', '10001', '10001', '10001', '11110'],
+                'E': ['11111', '10000', '11100', '10000', '11111'],
+                'F': ['11111', '10000', '11100', '10000', '10000'],
+                'G': ['01110', '10000', '10111', '10001', '01110'],
+                'H': ['10001', '10001', '11111', '10001', '10001'],
+                'I': ['11111', '00100', '00100', '00100', '11111'],
+                'J': ['11111', '00010', '00010', '10010', '01100'],
+                'K': ['10001', '10010', '11100', '10010', '10001'],
+                'L': ['10000', '10000', '10000', '10000', '11111'],
+                'M': ['10001', '11011', '10101', '10001', '10001'],
+                'N': ['10001', '11001', '10101', '10011', '10001'],
+                'O': ['01110', '10001', '10001', '10001', '01110'],
+                'P': ['11110', '10001', '11110', '10000', '10000'],
+                'Q': ['01110', '10001', '10101', '10011', '01101'],
+                'R': ['11110', '10001', '11110', '10010', '10001'],
+                'S': ['01111', '10000', '01110', '00001', '11110'],
+                'T': ['11111', '00100', '00100', '00100', '00100'],
+                'U': ['10001', '10001', '10001', '10001', '01110'],
+                'V': ['10001', '10001', '10001', '01010', '00100'],
+                'W': ['10001', '10001', '10101', '11011', '10001'],
+                'X': ['10001', '01010', '00100', '01010', '10001'],
+                'Y': ['10001', '01010', '00100', '00100', '00100'],
+                'Z': ['11111', '00010', '00100', '01000', '11111'],
+                ' ': ['00000', '00000', '00000', '00000', '00000']
+            };
+            
+            let result = '';
+            
+            // Generate each row
+            for (let row = 0; row < 5; row++) {
+                let line = '';
+                for (let char of text) {
+                    const pattern = letterPatterns[char] || letterPatterns[' '];
+                    const rowPattern = pattern[row];
+                    
+                    console.log(`Processing char '${char}', row ${row}, pattern: ${rowPattern}`);
+                    
+                    // Convert pattern to emojis
+                    for (let bit of rowPattern) {
+                        line += bit === '1' ? onEmoji : offEmoji;
+                    }
+                    
+                    // Add space between letters
+                    if (char !== ' ') {
+                        line += offEmoji;
+                    }
+                }
+                result += line + '\\n';
+            }
+            
+            console.log('Final result:', result);
+            return result.trim();
+        }
+        
+        function generateTest() {
+            const text = document.getElementById('input-text').value.toUpperCase();
+            const onEmoji = document.getElementById('input-on').value;
+            const offEmoji = document.getElementById('input-off').value;
+            const output = document.getElementById('output');
+            
+            try {
+                console.log('Starting test with:', {text, onEmoji, offEmoji});
+                const result = generateTextToEmoji(text, onEmoji, offEmoji);
+                output.textContent = result;
+                console.log('Test completed successfully');
+            } catch (error) {
+                console.error('Test failed:', error);
+                output.textContent = 'ERROR: ' + error.message;
+            }
+        }
+        
+        // Auto-run test
+        document.addEventListener('DOMContentLoaded', function() {
+            generateTest();
+        });
+    </script>
+</body>
+</html>

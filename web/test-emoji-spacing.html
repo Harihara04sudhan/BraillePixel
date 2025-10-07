@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Spacing Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; }
+        .test-section { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .result { 
+            background: #e9ecef; 
+            padding: 15px; 
+            margin: 10px 0; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+        button { background: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        input { padding: 6px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        .emoji-input { width: 60px; text-align: center; }
+        .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .comparison h4 { margin-top: 0; color: #333; }
+        .before { border-left: 4px solid #dc3545; }
+        .after { border-left: 4px solid #28a745; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Emoji Spacing Fix Test</h1>
+    <p>Testing emoji spacing improvements to prevent collapsed/misaligned emoji art.</p>
+    
+    <div class="test-section">
+        <h3>🔧 Test Custom Emoji Combinations</h3>
+        <div>
+            <label>Text: <input type="text" id="test-text" value="HI" placeholder="Enter text"></label>
+            <label>On Emoji: <input type="text" id="test-on" value="🔥" class="emoji-input"></label>
+            <label>Off Emoji: <input type="text" id="test-off" value="⚪" class="emoji-input"></label>
+            <button onclick="testSpacing()">Test Spacing</button>
+        </div>
+        <div id="spacing-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>📊 Common Emoji Combinations</h3>
+        <button onclick="testCommonCombinations()">Test Multiple Combinations</button>
+        <div id="combinations-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>⚠️ Problematic Emoji Test</h3>
+        <p>Testing emojis that commonly cause collapse issues:</p>
+        <button onclick="testProblematicEmojis()">Test Problematic Emojis</button>
+        <div id="problematic-result" class="result"></div>
+    </div>
+    
+    <div class="test-section comparison">
+        <div class="before">
+            <h4>❌ Before Fix (No Spacing)</h4>
+            <div id="before-result" class="result"></div>
+        </div>
+        <div class="after">
+            <h4>✅ After Fix (With Spacing)</h4>
+            <div id="after-result" class="result"></div>
+        </div>
+    </div>
+    
+    <script src="script-simple.js"></script>
+    <script>
+        // Old version without spacing for comparison
+        function generateTextToEmojiOld(text, onEmoji, offEmoji) {
+            const letterPatterns = {
+                'H': ['10001', '10001', '11111', '10001', '10001'],
+                'I': ['11111', '00100', '00100', '00100', '11111'],
+                'A': ['01110', '10001', '11111', '10001', '10001'],
+                'B': ['11110', '10001', '11110', '10001', '11110'],
+                ' ': ['00000', '00000', '00000', '00000', '00000']
+            };
+            
+            let result = '';
+            for (let row = 0; row < 5; row++) {
+                let line = '';
+                for (let char of text) {
+                    const pattern = letterPatterns[char] || letterPatterns[' '];
+                    const rowPattern = pattern[row];
+                    
+                    for (let bit of rowPattern) {
+                        line += bit === '1' ? onEmoji : offEmoji;
+                    }
+                    line += offEmoji; // Old spacing
+                }
+                result += line + '\\n';
+            }
+            return result.trim();
+        }
+        
+        function testSpacing() {
+            const text = document.getElementById('test-text').value.toUpperCase();
+            const onEmoji = document.getElementById('test-on').value || '🔥';
+            const offEmoji = document.getElementById('test-off').value || '⚪';
+            
+            try {
+                const result = generateTextToEmoji(text, onEmoji, offEmoji);
+                document.getElementById('spacing-result').textContent = 
+                    `Text: "${text}" | On: ${onEmoji} | Off: ${offEmoji}\\n\\n${result}`;
+            } catch (error) {
+                document.getElementById('spacing-result').textContent = 'ERROR: ' + error.message;
+            }
+        }
+        
+        function testCommonCombinations() {
+            const combinations = [
+                { text: 'HI', on: '🔥', off: '⚪', name: 'Fire & White Circle' },
+                { text: 'OK', on: '✅', off: '❌', name: 'Check & Cross' },
+                { text: 'LOVE', on: '❤️', off: '🤍', name: 'Red & White Heart' },
+                { text: 'YES', on: '🌟', off: '⭐', name: 'Star & Glowing Star' },
+                { text: 'NO', on: '🔴', off: '⚫', name: 'Red & Black Circle' }
+            ];
+            
+            let results = '';
+            combinations.forEach(combo => {
+                try {
+                    const result = generateTextToEmoji(combo.text, combo.on, combo.off);
+                    results += `--- ${combo.name} (${combo.text}) ---\\n${result}\\n\\n`;
+                } catch (error) {
+                    results += `--- ${combo.name} ERROR: ${error.message} ---\\n\\n`;
+                }
+            });
+            
+            document.getElementById('combinations-result').textContent = results;
+        }
+        
+        function testProblematicEmojis() {
+            // These emoji combinations often cause spacing/collapse issues
+            const problematic = [
+                { text: 'AB', on: '👨‍💻', off: '👩‍💻', name: 'Complex People Emojis' },
+                { text: 'XY', on: '🏳️‍🌈', off: '🏳️‍⚧️', name: 'Flag Emojis' },
+                { text: 'ZZ', on: '👨‍👩‍👧‍👦', off: '👨‍👨‍👧', name: 'Family Emojis' },
+                { text: 'QQ', on: '🔥', off: '💧', name: 'Fire & Water' }
+            ];
+            
+            let results = 'Testing problematic emoji combinations:\\n\\n';
+            problematic.forEach(combo => {
+                try {
+                    const result = generateTextToEmoji(combo.text, combo.on, combo.off);
+                    results += `--- ${combo.name} ---\\n${result}\\n\\n`;
+                } catch (error) {
+                    results += `--- ${combo.name} ERROR: ${error.message} ---\\n\\n`;
+                }
+            });
+            
+            document.getElementById('problematic-result').textContent = results;
+        }
+        
+        function showComparison() {
+            const text = 'HI';
+            const onEmoji = '🔥';
+            const offEmoji = '⚪';
+            
+            // Before (old method)
+            const oldResult = generateTextToEmojiOld(text, onEmoji, offEmoji);
+            document.getElementById('before-result').textContent = oldResult;
+            
+            // After (new method with spacing)
+            const newResult = generateTextToEmoji(text, onEmoji, offEmoji);
+            document.getElementById('after-result').textContent = newResult;
+        }
+        
+        // Auto-test when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                testSpacing();
+                showComparison();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

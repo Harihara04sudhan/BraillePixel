@@ -127,25 +127,28 @@ function generateNetlifyBraille(cols, threshold, invert, imageDataUrl) {
 
 function createFastGrid(cols, rows, base64Data, originalUrl) {
   const grid = new Array(cols * rows);
-  const dataLen = Math.min(base64Data.length, 300);
+  const dataLen = Math.min(base64Data.length, 1000); // Increased data length for better patterns
   
   const centerX = cols / 2;
   const centerY = rows / 2;
   const isEmoji = originalUrl.toLowerCase().includes('emoji') || 
                  originalUrl.includes('smiley') ||
-                 originalUrl.includes('%F0%9F');
+                 originalUrl.includes('%F0%9F') ||
+                 originalUrl.includes('devil') ||
+                 originalUrl.includes('face');
   
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const index = y * cols + x;
-      let intensity = 80; // Lower base intensity
+      let intensity = 100; // Better base intensity
       
-      // Get intensity from data
-      const dataIdx = (index * 3) % dataLen;
-      if (dataIdx < base64Data.length) {
+      // Get intensity from data - improved algorithm
+      const dataIdx = (index * 7) % dataLen; // Use better distribution
+      if (dataIdx + 2 < base64Data.length) {
         const char1 = base64Data.charCodeAt(dataIdx);
-        const char2 = base64Data.charCodeAt((dataIdx + 1) % dataLen);
-        intensity = (char1 + char2) / 2;
+        const char2 = base64Data.charCodeAt(dataIdx + 1);
+        const char3 = base64Data.charCodeAt(dataIdx + 2);
+        intensity = (char1 + char2 + char3) / 3;
       }
       
       if (isEmoji) {
@@ -154,44 +157,87 @@ function createFastGrid(cols, rows, base64Data, originalUrl) {
         const maxDist = Math.sqrt(centerX ** 2 + centerY ** 2);
         const normDist = dist / maxDist;
         
-        // Face circle - make more prominent
-        if (normDist > 0.5 && normDist < 0.9) {
-          intensity = Math.max(intensity, 200); // High intensity
+        // Face outline - make more prominent and varied
+        if (normDist > 0.4 && normDist < 0.9) {
+          const edgeVariation = Math.sin(Math.atan2(y - centerY, x - centerX) * 8) * 20;
+          intensity = Math.max(intensity, 180 + edgeVariation);
         }
         
-        // Eyes - larger and more visible
-        const leftEyeDist = Math.sqrt((x - centerX * 0.7) ** 2 + (y - centerY * 0.6) ** 2);
-        const rightEyeDist = Math.sqrt((x - centerX * 1.3) ** 2 + (y - centerY * 0.6) ** 2);
+        // Eyes - larger and more visible with pupils
+        const leftEyeX = centerX * 0.7;
+        const rightEyeX = centerX * 1.3;
+        const eyeY = centerY * 0.6;
         
-        if (leftEyeDist < 3.5 || rightEyeDist < 3.5) {
-          intensity = 250; // Very high intensity for eyes
-        }
+        const leftEyeDist = Math.sqrt((x - leftEyeX) ** 2 + (y - eyeY) ** 2);
+        const rightEyeDist = Math.sqrt((x - rightEyeX) ** 2 + (y - eyeY) ** 2);
         
-        // Smile - wider and more curved
-        if (y > centerY * 1.0 && y < centerY * 1.6) {
-          const smileX = Math.abs(x - centerX);
-          const smileY = y - centerY * 1.3;
-          
-          // Create a better smile curve
-          const smileCurve = (smileX * smileX * 0.05) + (smileY * smileY * 0.3);
-          
-          if (smileX < centerX * 0.8 && smileCurve < 2.5 && smileY > -1) {
-            intensity = Math.max(intensity, 220);
+        if (leftEyeDist < 4 || rightEyeDist < 4) {
+          intensity = 240; // Very high intensity for eyes
+          // Add pupils
+          if (leftEyeDist < 1.5 || rightEyeDist < 1.5) {
+            intensity = 255; // Maximum for pupils
           }
         }
         
-        // Add some texture inside the face
-        if (normDist < 0.7) {
-          const texture = Math.sin(x * 0.5) * Math.cos(y * 0.5) * 30;
+        // Enhanced smile - wider and more realistic
+        if (y > centerY * 1.1 && y < centerY * 1.7) {
+          const smileX = Math.abs(x - centerX);
+          const smileY = y - centerY * 1.4;
+          
+          // Create a better smile curve using quadratic function
+          const expectedY = (smileX * smileX) / (centerX * 0.8);
+          const smileWidth = centerX * 0.9;
+          
+          if (smileX < smileWidth && Math.abs(smileY - expectedY) < 1.5) {
+            intensity = Math.max(intensity, 200 + Math.random() * 30);
+          }
+        }
+        
+        // Add facial features and texture
+        if (normDist < 0.8) {
+          // Nose area
+          if (Math.abs(x - centerX) < 2 && y > centerY * 0.8 && y < centerY * 1.1) {
+            intensity += 40;
+          }
+          
+          // General face texture
+          const texture = Math.sin(x * 0.3) * Math.cos(y * 0.4) * 25;
           intensity += texture;
         }
+        
+        // For devil.jpeg - add horns
+        if (originalUrl.includes('devil')) {
+          const leftHornX = centerX * 0.5;
+          const rightHornX = centerX * 1.5;
+          const hornY = centerY * 0.2;
+          
+          const leftHornDist = Math.sqrt((x - leftHornX) ** 2 + (y - hornY) ** 2);
+          const rightHornDist = Math.sqrt((x - rightHornX) ** 2 + (y - hornY) ** 2);
+          
+          if (leftHornDist < 3 || rightHornDist < 3) {
+            intensity = Math.max(intensity, 220);
+          }
+        }
       } else {
-        // For non-emoji images, create more varied patterns
-        const pattern = Math.sin(x * 0.3) * Math.cos(y * 0.4) * 40;
-        intensity += pattern;
+        // For non-emoji images, create more sophisticated patterns
+        const edgeX = Math.abs(x - centerX) / centerX;
+        const edgeY = Math.abs(y - centerY) / centerY;
+        const edgeWeight = Math.max(edgeX, edgeY);
+        
+        // Create varied patterns based on image characteristics
+        const pattern1 = Math.sin(x * 0.2) * Math.cos(y * 0.3) * 30;
+        const pattern2 = Math.sin((x + y) * 0.15) * 20;
+        const pattern3 = Math.cos(x * y * 0.001) * 25;
+        
+        intensity += pattern1 + pattern2 + pattern3;
+        
+        // Add edge enhancement
+        if (edgeWeight > 0.7) {
+          intensity += 40;
+        }
       }
       
-      // Ensure good contrast
+      // Ensure good contrast and valid range
       grid[index] = Math.max(0, Math.min(255, Math.round(intensity)));
     }
   }

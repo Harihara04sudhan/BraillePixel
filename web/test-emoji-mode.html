@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Mode Switch Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
+        .test { background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; font-weight: bold; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Emoji Mode Switch Test</h1>
+    
+    <div class="test">
+        <h3>Test Instructions</h3>
+        <p>1. Go to the main BraillePixel page</p>
+        <p>2. Click on the "😀 Emoji Art" tab</p>
+        <p>3. Try switching between "📸 Image to Emoji" and "✏️ Text to Emoji" modes</p>
+        <p>4. Verify that the input areas change correctly</p>
+    </div>
+    
+    <div class="test">
+        <h3>Expected Behavior</h3>
+        <ul>
+            <li><strong>Image Mode:</strong> Shows file upload area, hides text input</li>
+            <li><strong>Text Mode:</strong> Shows text input field, hides file upload area</li>
+            <li><strong>Switching:</strong> Should toggle instantly when radio buttons are clicked</li>
+        </ul>
+    </div>
+    
+    <div class="test">
+        <button onclick="openMainPage()">🚀 Open Main Page</button>
+        <button onclick="testModeSwitch()">🔧 Test Mode Switch Function</button>
+        <div id="test-result" class="status" style="display:none;"></div>
+    </div>
+    
+    <script>
+        function openMainPage() {
+            window.open('index.html', '_blank');
+        }
+        
+        function testModeSwitch() {
+            const result = document.getElementById('test-result');
+            result.style.display = 'block';
+            
+            // Test if we can access the function
+            try {
+                // This will test the function exists in the global scope
+                if (typeof handleEmojiModeChange === 'function') {
+                    result.textContent = '✅ handleEmojiModeChange function is available';
+                    result.className = 'status pass';
+                } else {
+                    result.textContent = '❌ handleEmojiModeChange function not found - check the main page';
+                    result.className = 'status fail';
+                }
+            } catch (error) {
+                result.textContent = '❌ Error testing function: ' + error.message;
+                result.className = 'status fail';
+            }
+        }
+        
+        // Test with iframe
+        function testInIframe() {
+            const iframe = document.createElement('iframe');
+            iframe.src = 'index.html';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            iframe.onload = function() {
+                try {
+                    const win = iframe.contentWindow;
+                    const doc = iframe.contentDocument;
+                    
+                    // Test if function exists
+                    if (typeof win.handleEmojiModeChange === 'function') {
+                        console.log('✅ Function found in iframe');
+                        
+                        // Test if elements exist
+                        const imageInput = doc.getElementById('emoji-image-input');
+                        const textInput = doc.getElementById('emoji-text-input');
+                        const radios = doc.querySelectorAll('input[name="emoji-mode"]');
+                        
+                        console.log('Image input:', imageInput ? 'found' : 'missing');
+                        console.log('Text input:', textInput ? 'found' : 'missing');
+                        console.log('Radio buttons:', radios.length);
+                        
+                        if (imageInput && textInput && radios.length >= 2) {
+                            console.log('✅ All elements found, testing mode switch...');
+                            
+                            // Test switching to text mode
+                            radios[1].click(); // Second radio should be text mode
+                            setTimeout(() => {
+                                const imageVisible = window.getComputedStyle(imageInput).display !== 'none';
+                                const textVisible = window.getComputedStyle(textInput).display !== 'none';
+                                
+                                console.log('After switch to text:');
+                                console.log('Image visible:', imageVisible);
+                                console.log('Text visible:', textVisible);
+                                
+                                if (!imageVisible && textVisible) {
+                                    console.log('✅ Mode switch working correctly!');
+                                } else {
+                                    console.log('❌ Mode switch not working');
+                                }
+                                
+                                document.body.removeChild(iframe);
+                            }, 100);
+                        }
+                    } else {
+                        console.log('❌ Function not found in iframe');
+                    }
+                } catch (error) {
+                    console.error('Error testing iframe:', error);
+                }
+            };
+        }
+        
+        // Auto-test when page loads
+        setTimeout(testInIframe, 1000);
+    </script>
+</body>
+</html>
