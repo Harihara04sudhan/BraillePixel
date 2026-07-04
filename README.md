@@ -1,5 +1,20 @@
 # BraillePixel
 
+[![CI](https://github.com/Harihara04sudhan/BraillePixel/actions/workflows/ci.yml/badge.svg)](https://github.com/Harihara04sudhan/BraillePixel/actions/workflows/ci.yml)
+
+## Install
+
+```bash
+pip install -e .          # from a clone (PyPI release coming)
+braillepixel braille examples/smiley.jpeg --cols 40
+braillepixel emoji examples/devil.jpeg --emoji-set geometric --width 30
+braillepixel text "HELLO" --font block
+```
+
+Core modules live in the `braillepixel/` package; the root-level
+`textart.py` / `emoji_art.py` / `ascii_text.py` remain as thin
+backward-compatible shims.
+
 <!-- Badges -->
 <!-- Uncomment / replace after publishing to PyPI or adding CI -->
 <!-- ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) -->

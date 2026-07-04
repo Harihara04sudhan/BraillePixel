@@ -14,9 +14,9 @@ import os
 
 # Import our existing modules
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from textart import image_to_braille, resize_to_cells
-from emoji_art import image_to_emoji_mosaic, text_to_emoji_art, EMOJI_SETS, resize_image
-from ascii_text import text_to_ascii_art, create_border, create_gradient_text
+from braillepixel.textart import image_to_braille, resize_to_cells
+from braillepixel.emoji_art import image_to_emoji_mosaic, text_to_emoji_art, EMOJI_SETS, resize_image
+from braillepixel.ascii_text import text_to_ascii_art, create_border, create_gradient_text
 
 app = Flask(__name__)
 CORS(app)

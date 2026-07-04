@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "braillepixel"
+version = "0.1.0"
+description = "Convert images and text to Braille, ASCII, and emoji art"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Harihara Sudhan R" }]
+requires-python = ">=3.9"
+dependencies = ["Pillow>=10.0.0"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Artistic Software",
+    "Topic :: Multimedia :: Graphics",
+]
+
+[project.urls]
+Homepage = "https://github.com/Harihara04sudhan/BraillePixel"
+
+[project.scripts]
+braillepixel = "braillepixel.cli:main"
+
+[tool.setuptools]
+packages = ["braillepixel"]
