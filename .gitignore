@@ -6,6 +6,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Test / build artifacts
+.pytest_cache/
+build/
+dist/
+*.egg-info/
+
 # IDE
 .vscode/
 .idea/

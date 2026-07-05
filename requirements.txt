@@ -1,1 +1,6 @@
-Pillow>=10.0.0,<11.0.0
+# Core image processing
+Pillow>=10.0.0
+
+# Local web interface (web_server.py)
+Flask>=3.0.0
+Flask-CORS>=4.0.0

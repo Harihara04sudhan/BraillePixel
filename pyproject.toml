@@ -26,3 +26,6 @@ braillepixel = "braillepixel.cli:main"
 
 [tool.setuptools]
 packages = ["braillepixel"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

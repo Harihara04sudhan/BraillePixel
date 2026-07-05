@@ -15,11 +15,6 @@ Core modules live in the `braillepixel/` package; the root-level
 `textart.py` / `emoji_art.py` / `ascii_text.py` remain as thin
 backward-compatible shims.
 
-<!-- Badges -->
-<!-- Uncomment / replace after publishing to PyPI or adding CI -->
-<!-- ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) -->
-<!-- ![Python Versions](https://img.shields.io/badge/python-3.9+-blue.svg) -->
-
 🎨 **Multi-format text art generator** - Convert images and text to Braille, Emoji, and ASCII art with CLI tools + web interface.
 
 ## 🚀 Quick Demo
@@ -178,9 +173,9 @@ python web_server.py
 ```
 
 ## 🎯 Requirements
-- **Python 3.9+** (tested on 3.13)
+- **Python 3.9+** (CI tests 3.10–3.12)
 - **Pillow** (image processing)
-- **Flask + Flask-CORS** (web interface)
+- **Flask + Flask-CORS** (local web interface only)
 
 ## 📝 CLI Arguments
 
